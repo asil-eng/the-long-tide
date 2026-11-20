@@ -225,6 +225,23 @@ export class Player {
       this.clips[key] = c;
       const a = this.mixer.clipAction(c); a.play(); a.setEffectiveWeight(0); this.actions[key] = a;
     }
+    this.finishClips();
+  }
+
+  /** Use clips already retargeted onto this skeleton: { idle, walk, run, sit } */
+  setBakedClips(clips) {
+    this.mixer = new THREE.AnimationMixer(this.model);
+    this.clips = {}; this.actions = {};
+    for (const [key, c] of Object.entries(clips)) {
+      if (!c) continue;
+      c.userData = { speed: 0, phase0: 0 };
+      this.clips[key] = c;
+      const a = this.mixer.clipAction(c); a.play(); a.setEffectiveWeight(0); this.actions[key] = a;
+    }
+    this.finishClips();
+  }
+
+  finishClips() {
     for (const k of ['walk', 'run']) if (this.clips[k]) this.measureGait(k);
     const W = this.clips.walk?.userData, R = this.clips.run?.userData;
     // locomotion speeds = the speeds the clips were captured at, so feet plant without sliding

@@ -33,10 +33,10 @@ export async function runFarmStory(L, game, models, { startScene = 1 } = {}) {
   };
   const porchY = groundUnder(-8.4, -4.5);
   const npc = {
-    june: new NPC(scene, models.anims, 'june', V(-6.2, groundUnder(-6.2, -1.2), -1.2), Math.PI / 2),
-    wes: new NPC(scene, models.anims, 'wes', V(-4.6, heightAt(-4.6, 1.4), 1.4), -2.2),
-    ada: new NPC(scene, models.anims, 'ada', V(-8.6, porchY, -4.6), Math.PI / 2 + 0.2),
-    okafor: new NPC(scene, models.anims, 'okafor', V(0, -50, 0), 0),
+    june: new NPC(scene, models, 'june', V(-6.2, groundUnder(-6.2, -1.2), -1.2), Math.PI / 2),
+    wes: new NPC(scene, models, 'wes', V(-4.6, heightAt(-4.6, 1.4), 1.4), -2.2),
+    ada: new NPC(scene, models, 'ada', V(-8.6, porchY, -4.6), Math.PI / 2 + 0.2),
+    okafor: new NPC(scene, models, 'okafor', V(0, -50, 0), 0),
   };
   npc.okafor.visible = false;
   const chair = models.rocking_chair.clone(); patchModel(chair, { dustTop: 0.5, dustLow: 0.6, fade: 0.3 });
@@ -220,13 +220,17 @@ export async function runFarmStory(L, game, models, { startScene = 1 } = {}) {
     // drive away: once the truck is well down the road, cut to June on the porch
     await until(() => !L.indoors && L.mode === 'truck' && truck.position.distanceTo(V(-10, truck.position.y, -3)) > 70);
     hud.objective(null);
-    npc.june.root.position.set(-6.4, groundUnder(-6.4, -1.0), -1.0); npc.june.root.rotation.y = Math.PI / 2; npc.june.play('idle');
-    walkie.position.set(-6.15, npc.june.root.position.y + 1.0, -0.82); walkie.rotation.set(0, 1.2, 0.2);
-    const t = truck.position;
+    const runFrom = V(-8.9, porchY, -2.4), runTo = V(-6.6, porchY, -1.2);
+    npc.june.root.position.copy(runFrom); npc.june.lookAt(runTo); npc.june.play('run', 0.15);
+    walkie.visible = false;
+    // aim the second shot down the road toward the truck, never further than the road can be seen
+    const t = truck.position.clone(); const toT = t.clone().sub(V(-6.6, 0, -1.2)); if (toT.length() > 90) t.copy(V(-6.6, 0, -1.2).add(toT.setLength(90)));
+    t.y = heightAt(t.x, t.z);
     await cutscenes.play({
       subs: S.departureSubs,
       shots: [
-        { path: [[-1.2, 1.6, 2.6], [-1.6, 1.62, 2.1]], look: [[-6.6, 1.2, -1.6], [-6.6, 1.15, -1.6]], dur: 4.2, fov: 40 },
+        { path: [[-1.2, 1.6, 2.6], [-1.6, 1.62, 2.1]], look: [[-7.4, 1.2, -1.8], [-6.6, 1.15, -1.3]], dur: 4.2, fov: 40,
+          onUpdate: (k) => { if (k < 0.55) { const p = runFrom.clone().lerp(runTo, k / 0.55); npc.june.root.position.copy(p); } else if (npc.june.current !== npc.june.mixer.existingAction(npc.june.clips.idle)) { npc.june.play('idle', 0.3); npc.june.lookAt(t); } } },
         { path: [[-6.8, 1.6, -1.6], [-6.9, 1.7, -1.7]], look: [[t.x, t.y + 1, t.z], [t.x, t.y + 1.2, t.z]], dur: 5.8, fov: 26 },
       ],
       fadeOut: 1.4,
@@ -239,18 +243,21 @@ export async function runFarmStory(L, game, models, { startScene = 1 } = {}) {
     const launch = createLaunch(scene, V(OBS.center.x + 30, heightAt(OBS.center.x, OBS.center.z), OBS.center.z - 20));
     L.extraUpdate.push((dt) => launch.update(dt));
     await cutscenes.play({
-      fadeIn: 1.5, subs: S.launchSubs,
+      fadeIn: 1.5, subs: S.launchSubs, fadeOut: 2.6, fadeColor: '#fff',
       shots: [
         { path: [[-2.4, 1.2, 2.6], [-2.8, 1.25, 2.2]], look: [[-6.4, 1.3, -1.0], [-6.2, 1.5, -0.8]], dur: 4.5, fov: 36, onUpdate: (k) => { if (k > 0.3) launch.go(); } },
         { path: [[-7.4, 1.55, -1.4], [-7.5, 1.6, -1.5]], look: [[180, 40, -170], [180, 120, -170]], dur: 7.5, fov: 30, onUpdate: (k) => launch.track(k) },
       ],
     });
+    L.ended = true; game.input.state.enabled = false; truck.locked = true;
+    cutscenes.setFade(1, '#fff', 0); hud.objective(null); hud.marker(null);
+    L.hold = { pos: camera.position.clone(), look: camera.position.clone().add(V(0, 0.2, -1)) };
     audio.stopMusic(3);
-    cutscenes.setFade(1, '#fff', 2.5);
-    await wait(3);
-    cutscenes.setFade(1, '#fff', 0); hud.objective(null); L.hold = { pos: camera.position.clone(), look: camera.position.clone().add(V(0, 0.2, -1)) };
+    await wait(0.8);
     await cutscenes.showCard('<span style="color:#3a2c22">End of the Farm</span><br><small style="font-size:.45em;letter-spacing:.3em;color:#5a4636">' + STORY.transit.card + '</small>', 4.5);
     save.store({ level: 'transit', scene: 1 });
+    await wait(1.5);
+    location.href = location.pathname; // back to the title screen
   }
 
   const scenes = [scene1, scene2, scene3, scene4, scene5];
@@ -267,7 +274,7 @@ function createLaunch(scene, pad) {
   const head = new THREE.Sprite(new THREE.SpriteMaterial({ color: '#ffe8c8', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
     map: (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, '#fff'); gr.addColorStop(0.2, 'rgba(255,220,170,.8)'); gr.addColorStop(1, 'rgba(255,170,90,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })() }));
   head.scale.setScalar(9); head.visible = false; scene.add(head);
-  const glow = new THREE.PointLight('#ffb070', 0, 900, 1.2); scene.add(glow);
+  const glow = new THREE.PointLight('#ffb070', 0, 380, 2); scene.add(glow);
   const N = 420; const puffs = [];
   const geo = new THREE.PlaneGeometry(1, 1);
   const mat = new THREE.MeshBasicMaterial({ color: '#cfb39e', transparent: true, opacity: 0.13, depthWrite: false,
@@ -282,7 +289,7 @@ function createLaunch(scene, pad) {
     update(dt, cam) {
       if (t < 0) return;
       t += dt; const k = Math.min(1, t / 14);
-      const p = pos(k); head.position.copy(p); head.visible = true; glow.position.copy(p); glow.intensity = 4000 * (1 - k * 0.6);
+      const p = pos(k); head.position.copy(p); head.visible = true; glow.position.copy(p); glow.intensity = 90 * (1 - k * 0.7);
       if (emitted < N && Math.floor(t * 30) > emitted) { puffs.push({ p: p.clone().add(new THREE.Vector3((Math.random() - 0.5) * 2, -3, (Math.random() - 0.5) * 2)), s: 2.2 + Math.random() * 1.8, born: t }); emitted++; }
       inst.count = puffs.length;
       const camQ = scene.userData.camQ || q;

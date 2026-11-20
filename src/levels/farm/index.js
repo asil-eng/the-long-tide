@@ -20,6 +20,8 @@ import { buildBedroom, ROOM } from './bedroom.js';
 import { createTrample } from '../../systems/trample.js';
 import { distToRoads } from '../../assets/terrain.js';
 import { runFarmStory } from './script.js';
+import { retargetClip } from '../../core/retarget.js';
+window.__retarget = retargetClip;
 import { save } from '../../systems/save.js';
 
 export async function startFarm(game) {
@@ -37,7 +39,14 @@ export async function startFarm(game) {
   const spawn = SPOTS.playerSpawn.clone(); spawn.y = heightAt(spawn.x, spawn.z);
   const player = new Player(game, playerGltf.scene, physics, spawn);
   player.setPosition(spawn, Math.PI * 0.6);
-  player.setClips(animGltf.scene, animGltf.animations);
+  // motion-captured walk (RenderPeople) and run, idle from the base library, all retargeted onto the player
+  const [walkGltf, runGltf] = await Promise.all([loadModel('m_walk'), loadModel('m_run2')]);
+  {
+    const find = (g, re) => g.animations.find((c) => re.test(c.name)) || g.animations[0];
+    const bake = (g, clip, name) => { try { return retargetClip(g.scene, clip, player.model, { name }); } catch (e) { console.warn('[retarget]', name, e.message); return null; } };
+    const baked = { idle: bake(animGltf, find(animGltf, /_idle$/i), 'idle'), walk: bake(walkGltf, walkGltf.animations[0], 'walk'), run: bake(animGltf, find(animGltf, /_run$/i), 'run'), sit: bake(animGltf, find(animGltf, /sitidle/i), 'sit') };
+    if (baked.walk && baked.run && baked.idle) player.setBakedClips(baked); else player.setClips(animGltf.scene, animGltf.animations);
+  }
   game.player = player;
 
   const audio = game.audio = createAudio();
@@ -147,7 +156,8 @@ export async function startFarm(game) {
   }
 
   // ---- story: title screen, then the five Farm scenes ----
-  const storyModels = { anims: animGltf };
+  const storyModels = { anims: animGltf, walk: walkGltf, run: runGltf };
+  await Promise.all(['june', 'wes', 'ada', 'okafor'].map(async (n) => { storyModels[n] = await loadModel(n); }));
   await Promise.all(['porch_table', 'lantern', 'rocking_chair', 'junes_radio', 'walkie', 'probe', 'chainfence', 'floodlight', 'dish', 'crate', 'barrel'].map(async (n) => { storyModels[n] = (await loadModel(n)).scene; }));
   function startStory(sceneN) { runFarmStory(level, game, storyModels, { startScene: sceneN }).catch((e) => console.error('[story]', e)); }
   if (!VIEWS[params.get('view')] && params.get('test') !== 'systems') {
@@ -179,7 +189,7 @@ export async function startFarm(game) {
     update(dt) {
       dialogue.update(dt);
       const cine = cutscenes.running;
-      truck.locked = busy();
+      truck.locked = busy() || level.ended;
       const pin = busy() ? lockedInput : input;
       physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot' && !cine) player.step(h, pin); });
       if (mode === 'foot' && !cine) player.frame(dt, physics.alpha, pin, camera);

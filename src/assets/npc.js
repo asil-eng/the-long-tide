@@ -1,72 +1,65 @@
-// Placeholder story characters: one rigged base mesh (the same Mixamo-style rig as the player),
-// cloned per character, scaled to their height and "dressed" in code: boots, trousers or a dress,
-// shirt, skin and hair painted by body height. Plays idle / sitting clips from the same file.
+// Story characters: realistic scanned people (June, Wes, Ada, Dr. Okafor), each on its own rig,
+// with motion-captured idle / sitting / walking / running clips retargeted onto their skeletons.
 import * as THREE from 'three';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import { patchMaterial } from './materialPatch.js';
+import { patchModel } from './materialPatch.js';
+import { retargetClip } from '../core/retarget.js';
 
-const LOOKS = {
-  june: { h: 1.36, boots: '#2e241d', legs: '#3c5170', shirt: '#8a3b2e', skin: '#c99a7c', hair: '#5a3824', dress: false },
-  wes: { h: 1.68, boots: '#2a211b', legs: '#34435a', shirt: '#5a6142', skin: '#c49377', hair: '#4a3020' },
-  ada: { h: 1.6, boots: '#2a221d', legs: '#3f4a44', shirt: '#4e5a52', skin: '#cfa58a', hair: '#bdb7aa', dress: true },
-  okafor: { h: 1.74, boots: '#1f1b18', legs: '#2a2c30', shirt: '#3a3f4c', skin: '#6a4430', hair: '#1e1916' },
-};
+const HEIGHT = { june: 1.38, wes: 1.7, ada: 1.6, okafor: 1.72 };
 
+/** clip sources: { anims: gltf (idle/sit/...), walk: gltf, run: gltf } */
 export class NPC {
-  constructor(scene, animGltf, who, pos, rotY = 0) {
-    const look = LOOKS[who];
+  constructor(scene, models, who, pos, rotY = 0) {
     this.who = who;
     this.root = new THREE.Group();
-    const model = SkeletonUtils.clone(animGltf.scene);
-    this.root.add(model);
-    model.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(model);
-    const s = look.h / (box.max.y - box.min.y);
-    model.scale.multiplyScalar(s); model.position.y = -box.min.y * s;
-    const mat = new THREE.MeshStandardMaterial({ roughness: 0.85 });
-    this.uniforms = { uBaseY: { value: 0 }, uH: { value: look.h } };
-    const col = (k) => new THREE.Color(look[k]);
-    patchMaterial(mat, {
-      dustTop: 0.25, dustLow: 0.35, dirtHeight: 0.35, fade: 0.08,
-      extraUniforms: {
-        ...this.uniforms,
-        cBoots: { value: col('boots') }, cLegs: { value: col('legs') }, cShirt: { value: col('shirt') }, cSkin: { value: col('skin') }, cHair: { value: col('hair') },
-        uDress: { value: look.dress ? 1 : 0 },
-      },
-      fragPars: 'uniform float uBaseY; uniform float uH; uniform vec3 cBoots; uniform vec3 cLegs; uniform vec3 cShirt; uniform vec3 cSkin; uniform vec3 cHair; uniform float uDress;',
-      beforeDust: /* glsl */ `
-        {
-          float y = (vFxWorldPos.y - uBaseY) / uH;
-          vec3 c = cBoots;
-          c = mix(c, uDress > 0.5 ? cShirt * 0.92 : cLegs, smoothstep(0.055, 0.07, y));
-          float waist = uDress > 0.5 ? 0.3 : 0.47;
-          c = mix(c, cShirt, smoothstep(waist - 0.01, waist + 0.01, y));
-          c = mix(c, cSkin, smoothstep(0.82, 0.84, y));
-          c = mix(c, cHair, smoothstep(0.935, 0.95, y));
-          // fabric weave & wear so it isn't flat plastic
-          float n = fx_fbm(vFxWorldPos * 38.0);
-          c *= 0.9 + 0.2 * n;
-          diffuseColor.rgb = c;
-        }`,
+    const model = SkeletonUtils.clone(models[who].scene);
+    model.traverse((o) => {
+      if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; }
+      if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = false; o.material.alphaTest = o.material.alphaMap ? 0.5 : 0; }
     });
-    model.traverse((o) => { if (o.isMesh) { o.material = mat; o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; } });
-    this.mixer = new THREE.AnimationMixer(model);
-    this.clips = animGltf.animations;
-    this.play('idle');
+    // Wes's downloaded tee carries a printed graphic: make it a plain, faded work shirt instead
+    if (who === 'wes') model.traverse((o) => { if (o.isMesh && /outfit_top/i.test(o.material.name)) { o.material.map = null; o.material.color.set('#5e6247'); o.material.roughness = 0.95; o.material.needsUpdate = true; } });
+    patchModel(model, { dustTop: 0.12, dustLow: 0.25, dirtHeight: 0.3, fade: 0.08 });
+    // stand it up if the rig came in lying down, then scale to the character's height
+    this.inner = new THREE.Group(); this.inner.add(model); this.root.add(this.inner);
+    model.updateMatrixWorld(true);
+    let box = new THREE.Box3().setFromObject(model, true); const sz = box.getSize(new THREE.Vector3());
+    if (sz.z > sz.y * 1.4) { model.rotation.x = -Math.PI / 2; model.updateMatrixWorld(true); box = new THREE.Box3().setFromObject(model, true); }
+    model.scale.multiplyScalar(HEIGHT[who] / (box.max.y - box.min.y));
+    model.updateMatrixWorld(true); box = new THREE.Box3().setFromObject(model, true);
+    model.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
+    this.model = model;
     this.root.position.copy(pos); this.root.rotation.y = rotY;
     scene.add(this.root);
+    this.root.updateMatrixWorld(true);
+
+    // retarget the clips onto this rig (while it is still in its rest pose)
+    const src = (g, re) => g && g.animations.find((c) => re.test(c.name));
+    const sources = {
+      idle: [models.anims, src(models.anims, /_idle$/i)],
+      sit: [models.anims, src(models.anims, /sitidle/i)],
+      walk: [models.walk, models.walk?.animations[0]],
+      run: [models.run, models.run?.animations[0]],
+    };
+    this.mixer = new THREE.AnimationMixer(model);
+    this.clips = {};
+    for (const [k, [g, clip]] of Object.entries(sources)) {
+      if (!g || !clip) continue;
+      try { this.clips[k] = retargetClip(g.scene, clip, model, { name: k, inPlace: true }); }
+      catch (e) { console.warn('[npc]', who, k, e.message); }
+    }
+    this.play('idle');
   }
   play(name, fade = 0.4) {
-    const re = { idle: /_idle$/i, sit: /sitidle/i, walk: /walk/i, run: /run/i, standup: /standup/i, sitdown: /sitdown/i }[name] || new RegExp(name, 'i');
-    const clip = this.clips.find((c) => re.test(c.name)); if (!clip) return;
-    // strip root motion so characters stay where they're placed
-    const c = clip.clone(); c.tracks = c.tracks.filter((t) => !/Hips.*\.position$/.test(t.name) || name === 'sit');
-    const a = this.mixer.clipAction(c);
-    a.reset().fadeIn(fade).play(); a.time = Math.random() * c.duration;
-    if (this.current && this.current !== a) this.current.fadeOut(fade);
+    const clip = this.clips[name]; if (!clip) return;
+    const a = this.mixer.clipAction(clip);
+    if (this.current === a) return;
+    a.reset().fadeIn(fade).play(); a.time = Math.random() * clip.duration;
+    if (this.current) this.current.fadeOut(fade);
     this.current = a;
   }
   set visible(v) { this.root.visible = v; }
-  update(dt) { this.uniforms.uBaseY.value = this.root.position.y; this.mixer.update(dt); }
+  get visible() { return this.root.visible; }
+  update(dt) { if (this.root.visible) this.mixer.update(dt); }
   lookAt(p) { this.root.rotation.y = Math.atan2(p.x - this.root.position.x, p.z - this.root.position.z); }
 }

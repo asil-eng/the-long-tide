@@ -61,7 +61,7 @@ export function createCutscenes(ui, camera, input, audio) {
         if (t >= total) {
           running = null; sub.classList.remove('on'); bars.classList.remove('on');
           camera.fov = prevFov; camera.updateProjectionMatrix();
-          input.state.enabled = true;
+          if (!cs.keepLocked) input.state.enabled = true;
           cs.onEnd?.();
           resolve();
         }

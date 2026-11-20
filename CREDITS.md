@@ -18,6 +18,13 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | bookshelf.glb | Wooden Bookcases with Books | Matthew Collings (mtcollings) | https://sketchfab.com/3d-models/wooden-bookcases-with-books-d0618ac16b2a4a87b9b6c7d5e6765626 | Modified: rescaled |
 | bedroom_bed.glb | Single wooden bed | franckross | https://sketchfab.com/3d-models/single-wooden-bed-c7bea79b8c7a4b7c9ec5eadfa2529b9a | Modified: rescaled |
 | bedroom_desk.glb | Vintage Wooden Workdesk | Poring | https://sketchfab.com/3d-models/vintage-wooden-workdesk-f1eddff773a740b78110610cef248093 | Modified: rescaled |
+| june.glb | Girl3 | stupidboy34 | https://sketchfab.com/3d-models/girl3-31ced030853b4705b81d82d07e7eaeed | Modified: auto-rigged (fitted Mixamo-style skeleton), decimated, rescaled |
+| wes.glb | teen-boy | theskipper | https://sketchfab.com/3d-models/teen-boy-fff65cd5b0934eff8e3a281766a52bf5 | Modified: rescaled; printed T-shirt graphic replaced with a plain shirt |
+| ada.glb | Polka Dot Blouse Portrait | restore50 | https://sketchfab.com/3d-models/polka-dot-blouse-portrait-39b8b1244503415e8325b27b694fe820 | Modified: auto-rigged, decimated, rescaled |
+| okafor.glb | Carla Rigged 001 | Renderpeople | https://sketchfab.com/3d-models/carla-rigged-001-rigged-3d-business-women-acf520f450d14dd799f98a6fede3edf5 | Modified: rescaled |
+| m_walk.glb | Nathan Animated 003 - Walking (mocap walk, retargeted) | Renderpeople | https://sketchfab.com/3d-models/nathan-animated-003-walking-3d-man-143a2b1ea5eb4385ae90a73657aca3bc | Modified: animation retargeted onto the characters, made in-place |
+| m_run2.glb | Character Run Animation (loaded for testing) | Kayozz (sachinkr858895) | https://sketchfab.com/3d-models/character-run-animation-3b4137658b1a4b429426d9eee45605cb | Not used in final locomotion |
+| m_run.glb | Running Man (evaluated, not used) | LasquetiSpice | https://sketchfab.com/3d-models/running-man-ab2e6214f8b7482690538a3b2bda4100 | Not used |
 | anims.glb | Basic Human Male (idle/walk/run/sit clips, retargeted onto player.glb) | enzinogenie | https://sketchfab.com/3d-models/basic-human-male-f1775be7b1b94e4ea40d25287585ee69 | Modified: clips retargeted by bone name, made in-place |
 | walkie.glb | Portable Radio – Walkie Talkie (Dual Band) | KrylatovKim (oblivionhero) | https://sketchfab.com/3d-models/portable-radio-walkie-talkie-dual-band-0b44c0e7c01c4ba883d748640c022d8e | Modified: rescaled |
 | probe.glb | Real Weather balloon Probe "BILBHY" | BlueMesh | https://sketchfab.com/3d-models/real-weather-balloon-probe-bilbhy-956fec6b85ae4af6b46a487289e2a200 | Modified: decimated 43k→12k, rescaled (balloon envelope built in code) |
@@ -61,4 +68,4 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | dresser.glb | Vintage Wooden Drawer 01 | James Ray Cock | https://polyhaven.com/a/vintage_wooden_drawer_01 |
 
 ## Created in code for this project
-Story characters' clothing (placeholder shader on the Basic Human Male mesh), weather balloon envelope, observatory dome and bunker, launch trail, tape puzzle UI. Terrain, hills and road network, corn and grass (procedural, instanced, LOD tiles), sky dome, height fog, dust particles and wheel dust trails, wind shader, dust/sun-fade material shader, color grade, the bedroom room shell, curtains, window light and children's drawings, all audio (synthesized engine, wind, footsteps, UI).
+World-space animation retargeting between rigs, weather balloon envelope, observatory dome and bunker, launch trail, tape puzzle UI. Terrain, hills and road network, corn and grass (procedural, instanced, LOD tiles), sky dome, height fog, dust particles and wheel dust trails, wind shader, dust/sun-fade material shader, color grade, the bedroom room shell, curtains, window light and children's drawings, all audio (synthesized engine, wind, footsteps, UI).
