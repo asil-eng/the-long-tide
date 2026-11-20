@@ -171,11 +171,13 @@ export class Player {
     const target = V(p.x, p.y + 1.55, p.z);
     const back = V(Math.sin(this.yaw) * Math.cos(this.pitch), Math.sin(this.pitch), Math.cos(this.yaw) * Math.cos(this.pitch));
     const side = V(Math.cos(this.yaw), 0, -Math.sin(this.yaw)).multiplyScalar(0.45); // over-the-shoulder
-    let dist = this.camDist;
+    if (this.bounds) side.multiplyScalar(0.55);
+    let dist = this.bounds ? 2.3 : this.camDist;
     const from = target.clone().add(side);
     const hit = this.physics.ray(from, back, dist + 0.3, this.collider);
     if (hit !== null) dist = Math.max(0.6, hit - 0.3);
     const want = from.clone().addScaledVector(back, dist);
+    if (this.bounds) { const B = this.bounds; want.x = THREE.MathUtils.clamp(want.x, B.x0, B.x1); want.z = THREE.MathUtils.clamp(want.z, B.z0, B.z1); want.y = THREE.MathUtils.clamp(want.y, B.y0, B.y1); }
     if (!this.camInit) { this.camPos.copy(want); this.camInit = true; }
     this.camPos.lerp(want, 1 - Math.exp(-dt * 14));
     camera.position.copy(this.camPos);

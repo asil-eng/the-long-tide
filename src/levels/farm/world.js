@@ -19,7 +19,7 @@ export function loadModel(name) {
 function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
 export const SPOTS = {
-  houseDoor: new THREE.Vector3(-8.6, 0, -2.2),   // in front of the porch steps
+  houseDoor: new THREE.Vector3(-5.6, 0, -2.2),   // in front of the porch steps
   truckSpawn: new THREE.Vector3(-3.0, 0, 4.5),
   playerSpawn: new THREE.Vector3(-6.0, 0, 1.0),
 };

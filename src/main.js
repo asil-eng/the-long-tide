@@ -30,4 +30,4 @@ renderer.setAnimationLoop((t) => {
   if (acc > 0.5) { debug.textContent = `${Math.round(frames / acc)} fps · ${quality.toUpperCase()} · G toggles graphics`; frames = 0; acc = 0; }
 });
 addEventListener('keydown', (e) => { if (e.code === 'KeyG' && !e.repeat && !level.typing) setQuality(quality === 'high' ? 'low' : 'high'); });
-window.__game = game;
+window.__game = game; window.__level = level;

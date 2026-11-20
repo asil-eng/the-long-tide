@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildFarmWorld, loadModel, SPOTS } from './world.js';
 import { createFarmAtmosphere, FARM_GRADE } from './atmosphere.js';
+import { world } from '../../assets/materialPatch.js';
 import { heightAt } from '../../assets/terrain.js';
 import { createPhysics } from '../../core/physics.js';
 import { createInput } from '../../core/input.js';
@@ -15,6 +16,7 @@ import { createCutscenes } from '../../systems/cutscene.js';
 import { createTriggers } from '../../systems/triggers.js';
 import { createTimeCounter } from '../../systems/timecounter.js';
 import { STORY } from '../../story.js';
+import { buildBedroom, ROOM } from './bedroom.js';
 
 export async function startFarm(game) {
   const { scene, camera, renderer, high } = game;
@@ -23,6 +25,8 @@ export async function startFarm(game) {
   const [farm, physics, playerGltf, truckGltf] = await Promise.all([buildFarmWorld(scene, { high }), createPhysics(), loadModel('player'), loadModel('truck')]);
   physics.addHeightfield(heightAt);
   physics.addStatic(farm.colliders);
+  const bedroom = await buildBedroom(scene, loadModel);
+  physics.addStatic(bedroom.colliders);
 
   const input = createInput(renderer.domElement);
   game.input = input;
@@ -57,6 +61,25 @@ export async function startFarm(game) {
   const timeCounter = game.timeCounter = createTimeCounter(game.ui, { startAge: 10 });
   timeCounter.show(false); // hidden on the Farm
   const busy = () => dialogue.busy || cutscenes.running;
+
+  // ---- farmhouse door <-> the bedroom ----
+  let indoors = false;
+  async function goInside() {
+    cutscenes.setFade(1, '#000', 0.5); input.state.enabled = false; await cutscenes.wait(0.55);
+    indoors = true; player.setPosition(bedroom.spawn, bedroom.spawnFacing);
+    world.uFogDensity.value = 0.0005; scene.environmentIntensity = 0.32; audio.setWind(0.12);
+    world.uSunDir.value.copy(bedroom.sunDir); player.bounds = bedroom.bounds;
+    await cutscenes.wait(0.2); cutscenes.setFade(0, '#000', 0.6); input.state.enabled = true;
+  }
+  async function goOutside() {
+    cutscenes.setFade(1, '#000', 0.5); input.state.enabled = false; await cutscenes.wait(0.55);
+    indoors = false; atmo.set(atmo.mode); player.bounds = null;
+    const p = SPOTS.houseDoor.clone(); p.y = heightAt(p.x, p.z); player.setPosition(p, Math.PI / 2);
+    audio.setWind(0.45);
+    await cutscenes.wait(0.2); cutscenes.setFade(0, '#000', 0.6); input.state.enabled = true;
+  }
+  triggers.add({ id: 'houseDoor', x: SPOTS.houseDoor.x, z: SPOTS.houseDoor.z, r: 1.6, interact: 'Go inside', onInteract: goInside });
+  triggers.add({ id: 'roomDoor', ...bedroom.door, interact: 'Go outside', onInteract: goOutside });
   const lockedInput = { axis: () => 0, key: () => false, hit: () => false, takeMouse: () => input.takeMouse() };
   function enterTruck() { mode = 'truck'; player.setActive(false); truck.enter(); }
   function exitTruck() {
@@ -95,7 +118,7 @@ export async function startFarm(game) {
   const level = {
     grade: FARM_GRADE,
     input, player, physics, farm, atmo, truck, audio, dust, dialogue, cutscenes, triggers, timeCounter,
-    get typing() { return dialogue.busy; },
+    get typing() { return dialogue.busy; }, bedroom, goInside, goOutside, get indoors() { return indoors; },
     get mode() { return mode; }, enterTruck, exitTruck,
     update(dt) {
       dialogue.update(dt);
@@ -118,7 +141,8 @@ export async function startFarm(game) {
       if (controls) controls.update();
       farm.update(camera.position);
       const focus = controls ? controls.target.clone().lerp(camera.position, 0.45) : (mode === 'truck' ? truck.position : player.position).clone().lerp(camera.position, 0.3);
-      focus.y = heightAt(focus.x, focus.z);
+      focus.y = indoors ? ROOM.origin.y : heightAt(focus.x, focus.z);
+      bedroom.update(world.uTime.value);
       atmo.update(focus);
       input.endFrame();
       if (++ready === 40) window.__ready = true;
