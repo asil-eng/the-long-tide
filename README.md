@@ -17,6 +17,15 @@
 
 ---
 
+<h2 align="center">▶ Watch the demo</h2>
+
+<p align="center">
+  <a href="docs/demo.mp4"><img src="docs/screenshots/demo_preview.gif" alt="Demo preview: supper on the porch, the truck chasing through the corn, the observatory at night, the launch at dusk. Click to watch the full video." width="80%"></a><br>
+  <sub><b><a href="docs/demo.mp4">Click to watch the full 1¾-minute gameplay demo (MP4)</a></b> · recorded live in the browser, nothing pre-rendered</sub>
+</p>
+
+---
+
 ## The story
 
 The crops are failing. The sky is the colour of rust. On a dust-choked farm at the edge of a dying valley, **Eli Harlan**, a farmer who used to fly test ships, eats supper on the porch because the kitchen is full of grit.
