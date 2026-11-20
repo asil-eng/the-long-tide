@@ -7,7 +7,7 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | File | Asset | Author | Source | Notes |
 |---|---|---|---|---|
 | farmhouse.glb | Countryside Home in USA | deerdesign.vn | https://sketchfab.com/3d-models/countryside-home-in-usa-6b456f3c136a462ba1b4147dde93df2a | Modified: siding repainted weathered off-white, rescaled |
-| truck.glb | Dodge Ram 2500 | VanuaG | https://sketchfab.com/3d-models/dodge-ram-2500-b4259af6d85d472b8fde9517bcd38154 | Modified: decimated 146k→50k tris, paint faded, rescaled |
+| truck.glb | Dodge Ram 2500 | VanuaG | https://sketchfab.com/3d-models/dodge-ram-2500-b4259af6d85d472b8fde9517bcd38154 | Modified: decimated 146k→50k tris, paint faded, brand badges removed, wheels split into separate pivots, rescaled |
 | barn.glb | Red Barn | volvor | https://sketchfab.com/3d-models/red-barn-906b74a1b8d7443eb66545dcc8a1b1c7 | Modified: rescaled, recompressed |
 | windmill.glb | Windmill pump farm | e.font | https://sketchfab.com/3d-models/windmill-pump-farm-5f9eae6a64bc4606966fee4e4843d305 | Modified: decimated 108k→25k |
 | water_tower.glb | Water Tower | Mehdi Shahsavan (ahmagh2e) | https://sketchfab.com/3d-models/water-tower-4e98f8c8fe4e4e9fae250a026974fe99 | Modified: rescaled |
@@ -18,7 +18,7 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | bookshelf.glb | Wooden Bookcases with Books | Matthew Collings (mtcollings) | https://sketchfab.com/3d-models/wooden-bookcases-with-books-d0618ac16b2a4a87b9b6c7d5e6765626 | Modified: rescaled |
 | bedroom_bed.glb | Single wooden bed | franckross | https://sketchfab.com/3d-models/single-wooden-bed-c7bea79b8c7a4b7c9ec5eadfa2529b9a | Modified: rescaled |
 | bedroom_desk.glb | Vintage Wooden Workdesk | Poring | https://sketchfab.com/3d-models/vintage-wooden-workdesk-f1eddff773a740b78110610cef248093 | Modified: rescaled |
-| (pending) player.glb | Hendrik the engineer who became a sheep herder | ustoopia | https://sketchfab.com/3d-models/hendrik-the-engineer-who-became-a-sheep-herder-84d6704563734976982f0d3491d726c6 | Not yet processed |
+| player.glb | Hendrik the engineer who became a sheep herder | ustoopia | https://sketchfab.com/3d-models/hendrik-the-engineer-who-became-a-sheep-herder-84d6704563734976982f0d3491d726c6 | Modified: kept the T-pose rig only, rescaled to 1.8 m; walk/run animation is procedural (code) |
 
 ## Poly Haven (CC0)
 | File | Asset | Authors | Source |
@@ -42,6 +42,14 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | barrel.glb | Barrel 01 | Jorge Camacho | https://polyhaven.com/a/Barrel_01 |
 | crate.glb | Wooden Crate 01 | James Ray Cock | https://polyhaven.com/a/wooden_crate_01 |
 | tyre.glb | Old Tyre | MP | https://polyhaven.com/a/old_tyre |
+| boulder.glb | Boulder 01 | Rico Cilliers | https://polyhaven.com/a/boulder_01 |
+| dry_branches.glb | Dry Branches Medium 01 | Rico Cilliers | https://polyhaven.com/a/dry_branches_medium_01 |
+| dead_tree.glb | Dead Tree Trunk 02 | Jenelle van Heerden, Rico Cilliers | https://polyhaven.com/a/dead_tree_trunk_02 |
+| chair.glb | School Chair 01 | Ethan Place | https://polyhaven.com/a/SchoolChair_01 |
+| alarm_clock.glb | Alarm Clock 01 | Yann Kervran, James Ray Cock | https://polyhaven.com/a/alarm_clock_01 |
+| books.glb | Book Encyclopedia Set 01 | John Malcolm | https://polyhaven.com/a/book_encyclopedia_set_01 |
+| lantern.glb | Lantern 01 | Rajil Jose Macatangay | https://polyhaven.com/a/Lantern_01 |
+| dresser.glb | Vintage Wooden Drawer 01 | James Ray Cock | https://polyhaven.com/a/vintage_wooden_drawer_01 |
 
 ## Created in code for this project
-Terrain and dirt road blending, corn field (procedural plants), dry grass, sky dome, height fog, dust particles, wind shader, dust/sun-fade material shader, color grade.
+Terrain, hills and road network, corn and grass (procedural, instanced, LOD tiles), sky dome, height fog, dust particles and wheel dust trails, wind shader, dust/sun-fade material shader, color grade, the bedroom room shell, curtains, window light and children's drawings, all audio (synthesized engine, wind, footsteps, UI).
