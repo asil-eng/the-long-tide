@@ -1,176 +1,87 @@
-# Movie version: the game follows the film's story
+# The Long Tide
 
-A level-by-level adaptation of the film's plot for a private fan game. All dialogue below is original, written for the game; swap in your own lines freely.
+An original story for a single-player, third-person browser game. A farmer who used to fly test ships leaves his daughter on a dying, dust-choked farm to save a failing deep-space relay, the only thing that can guide humanity's colony ships to a new world. Time runs slower for him than for her. The only line between them is a pair of old walkie-talkies on channel 9.
 
-## Overview, characters and the time counter
+All dialogue is written for this game and lives in `/src/story.js`. Read the matching section here before building each level.
 
-A former pilot leaves his daughter and a dying Earth to search for a new home through a wormhole, then has to send the answer back across time.
+## Characters
 
 | Character | Who they are | In the game |
 | --- | --- | --- |
-| **Cooper** (the player) | Ex-pilot turned farmer, widower, father of two | Playable in every level |
-| **Murph** | His 10-year-old daughter; later a brilliant scientist | Messages, the bookshelf, the ending |
-| **Tom** | His teenage son; later runs the farm | Messages, one farm scene |
-| **Donald** | Cooper's father-in-law, lives on the farm | Prologue only |
-| **Professor Brand** | Leads the secret space program | Briefing, messages |
-| **Amelia Brand** | Scientist on the crew, the professor's daughter | Companion on every planet |
-| **Romilly, Doyle** | Crew members | Water Planet, Ice Planet |
-| **Dr. Mann** | Scientist stranded on the ice planet | Ice Planet villain |
-| **The robots** | Two crew robots with dry humor | Use a simple placeholder model or one you find yourselves |
+| **Eli Harlan** (the player) | Farmer in his late 30s. Years ago he flew the test ships that carried the Kestrel relay out of the solar system. Widower. | Playable in every level |
+| **June Harlan** | His daughter: 10 on the farm, then an engineer at the observatory, then an old woman | Radio, the bedroom, messages, the finale's voice, the ending |
+| **Wes Harlan** | His son, 14, steady and quiet | Farm (the balloon chase), messages |
+| **Ada Harlan** | Eli's mother, sharp-tongued, lives on the farm | Farm (supper) |
+| **Dr. Nia Okafor** | Runs the half-buried observatory at the valley's edge | Farm (night drive), mission briefings |
+| **Tomas Reyes** | Mission engineer, jokes when he's scared | Tide World (lost in the surge) |
+| **Sela Ward** | Mission biologist and second pilot | Tide World, the relay, the ending's final line |
+| **KESTREL-2** | The relay probe: a deep-space beacon that maps the route to the colony world and is now failing | Its clicking distress call drives the plot |
 
-**Time counter:** a corner HUD shows "EARTH YEARS PASSED" and Murph's age. It barely moves on Earth and in space, then races on the Water Planet at 1 hour there = 7 years on Earth. Squeeze that into game time: 1 real minute on the Water Planet = 3.5 Earth years.
+## The time counter
 
-## Level 1: The Farm (about 6–8 minutes)
+A corner HUD reads "YEARS PASSED AT HOME" and "JUNE'S AGE". It barely moves on Earth and in transit. On the Tide World, one hour there costs five years at home. In game time, one real minute on the Tide World costs 2.5 years at home.
 
-Cooper chases a drone, decodes Murph's "ghost," finds the hidden space program and says goodbye. This is the open-world level: the farm, the fields and the roads are free to explore.
+## Level 1: The Farm (about 8–10 minutes)
 
-**Look:** dusty orange sky, endless dry corn, a white farmhouse, the old pickup. Dust on every surface.
+Golden hour, then a dust storm, then night, then the next morning. The farm valley is open to explore between scenes.
 
-**Scene 1 — Breakfast.** Dust coats the table. Donald grumbles about the storms. Murph says a ghost keeps knocking books off her shelf.
+**Scene 1. Supper on the porch.** A dust warning crackles on the kitchen radio. The family eats on the porch because the kitchen is full of grit. June has built a radio out of salvaged parts, and it keeps picking up a slow, repeating click. Ada thinks it's interference. June thinks it's a voice.
 
-- **Murph:** "It's not a ghost, Dad. I think it's trying to tell me something."
-- **Cooper:** "Then write down what it says. That's what a scientist would do."
+**Scene 2. The balloon chase (gameplay).** Wes spots a silver weather balloon sinking over the east fields, trailing a payload box. Eli and Wes chase it in the truck, straight through the corn, following a signal meter on the dash until it comes down. The player recovers the payload. It's stamped with the observatory's mark.
 
-**Scene 2 — The drone chase (gameplay).** On the drive to school, an old solar drone flies low overhead. Cooper drives the truck off-road through the corn, chasing it toward a reservoir. Tom steers while Cooper takes over the drone with a laptop. Reward: a working drone part and a great first driving sequence.
+**Scene 3. The storm and the tape (puzzle).** A dust storm rolls in. In June's room, with the storm against the window, the player lines up the payload's tape log with the live clicks on June's radio: shift the tape and set the speed until the marks match. Decoded, the clicks are a distress call: *KESTREL-2. Power failing. Route data at risk.* Eli knows the name. He flew it out there.
 
-**Scene 3 — The dust lines (puzzle).** A storm blows in through Murph's open window. Dust settles on the floor in stripes. The player walks the room, reads the thick and thin lines as binary and decodes them into coordinates on a map.
+**Scene 4. The night drive.** Eli drives the payload to the half-buried observatory at the far end of the valley road. Behind a chain-link fence, under floodlights, Dr. Okafor explains. The crops are failing everywhere. Colony ships are almost ready, but the route to the new world lives in Kestrel-2, and Kestrel is dying. Someone has to fly out and fix it, and Eli is the last pilot who knows that ship.
 
-**Scene 4 — The base.** Cooper and Murph drive to the coordinates at night and find a fenced, hidden facility. Inside: Professor Brand and a launch rocket. He explains: the crops are dying, a wormhole appeared near Saturn, and someone needs to fly through it.
+**Scene 5. The goodbye.** The next morning, June won't open her door. Eli talks to her through it, then leaves one of the pair of walkie-talkies on her bookshelf. He keeps the other, set to channel 9. He drives away. June runs onto the porch too late, holding the walkie-talkie. Weeks later, from the same porch, she watches a launch trail climb over the hills. Fade to white.
 
-- **Professor Brand:** "You're the best pilot we ever trained. And the only one we have left."
+## Level 2: Transit (text card or short cutscene)
 
-**Scene 5 — The goodbye.** Murph is furious and refuses to come downstairs. Cooper gives her his watch; he keeps one that matches.
+Two years of sleep, then a slingshot around Jupiter to reach the outer dark. The crew records messages home. Eli's is short. The ship, the *Longtide*, drops into a gravity well beside a heavy, dim planet whose shallow-ocean moon shelters the wreck of Kestrel-2's spare core.
 
-- **Murph:** "If you leave, you don't get to come back."
-- **Cooper:** "I'm coming back. When I do, we'll compare watches."
+Cheap version: a 20-second camera move past Jupiter and a text card.
 
-Cooper drives away as Murph runs out too late. Countdown, launch.
+## Level 3: The Tide World (about 5 minutes)
 
-## Level 2: The Wormhole (about 2 minutes)
+**Look:** ankle-to-knee-deep pale aqua water to the horizon, a pearl-white sky, and the giant planet filling a third of the sky with a faint gold ring of light around its limb. The tide here is the planet's pull, and it arrives as a surge.
 
-A short flying sequence that takes the crew from Earth orbit past Saturn and through the wormhole.
+**Gameplay:** wade toward the spare core's beacon while the time counter races. Retrieve the core. When the surge rises on the horizon, get back to the shuttle before it hits.
 
-**Gameplay:** the player pilots the ship with the mouse through a ring of debris near Saturn, then lines up with the wormhole. Once inside, controls lock and it becomes a ride: stretched starlight, bloom and a low rumble.
+**Beats:**
+1. **Landing.** Ward stays aboard the *Longtide*, far enough out that her clock runs normally. Reyes jokes about wet socks.
+2. **The core.** It's half buried in silt, and the player digs it out.
+3. **The surge.** A wall of water rises on the horizon. Eli gets the core aboard, but Reyes goes back for a dropped tool and the surge takes him.
+4. **The cost.** The shuttle's engines are flooded, and they wait while the counter climbs.
+5. **The messages (the emotional peak).** Back aboard, Ward has aged; she waited 19 years alone. Eli plays years of radio messages from June in one sitting: June at 12, angry; at 17, quiet; at 23, at the observatory; at 29, an engineer who has stopped saying "Dad" and started saying "Eli". Staged as a simple cockpit screen with a slow piano.
 
-**Story beats:**
+## Level 4: The Relay (the finale, about 5 minutes)
 
-1. A text card: "Two years later." The crew wakes from sleep as Saturn fills the window.
-2. Before going through, the crew records messages home. Cooper keeps his short.
-   - **Cooper:** "Murph, if you're watching this, I haven't forgotten. Keep writing things down."
-3. Inside the wormhole, Brand reaches out and something unseen seems to touch her hand.
-   - **Brand:** "I think someone's in here with us."
-4. They come out above three possible worlds orbiting a giant black hole.
+Kestrel-2 hangs at the edge of the system, a lattice of dead panels and one faint light. Eli spacewalks to it in zero-g. The relay is too far gone to fix from the manual alone.
 
-**Cheap version:** skip the flying. Play a 20-second cutscene with a camera move and the text card.
+The walkie-talkie crackles. After a long delay, it's June: 39 now, the observatory's chief engineer, who has spent her life studying this relay. She talks him through the repair. Every exchange has a lag of minutes, so the player acts on her instructions and waits for her answers.
 
-## Level 3: The Water Planet (about 4–6 minutes)
+**Gameplay:**
+1. Float between panels and reconnect three power couplings in the order June gives.
+2. Re-seat the spare core from the Tide World.
+3. **The choice.** Sending the full route home needs all of the relay's power, including the burn that would carry Eli back. June figures it out before he says it. He sends it anyway.
 
-The crew lands near the black hole to find a lost scientist's beacon, where every hour costs seven years, and a giant wave costs them a crew member and 23 years.
-
-**Look:** knee-deep water to the horizon, bright white sky, the black hole hanging huge overhead. A "mountain range" in the distance that turns out to be a wave.
-
-**Gameplay:** wade through the water toward the beacon signal. The time counter races. When the first wave appears, the player must find shelter or get to the ship before it hits.
-
-**Story beats:**
-
-1. **Landing.** Romilly stays on the main ship, which orbits far enough away that time runs normally for him.
-   - **Cooper:** "Every minute down here is a year up there. Nobody sightsees."
-2. **The wreck.** Brand finds the beacon in pieces. The scientist they came for died years ago in planet time, only minutes after landing.
-3. **The wave.** It rises on the horizon. Brand is pinned under debris, and a robot carries her to the ship. Doyle is too slow and is swept away.
-4. **Stuck.** Water floods the engines. The crew waits for them to drain while the counter keeps racing.
-5. **The return.** Back on the main ship, Romilly is grey-haired.
-   - **Romilly:** "Twenty-three years. I stopped counting the birthdays after the first ten."
-6. **The messages (the emotional peak).** Cooper watches 23 years of messages in one sitting: Tom grows up, marries, loses a child and finally stops writing. Then a message from Murph, now his age, angry and grieving.
-   - **Adult Murph:** "I'm the age you were when you left. You said you'd come back. Today I stopped believing you."
-
-Do the message scene as a simple screen in the cockpit. With a sad piano track, it will hit hard.
-
-## Level 4: The Ice Planet (about 6–8 minutes)
-
-The crew wakes the famous Dr. Mann on a frozen world, learns the mission's dark secret and survives his betrayal.
-
-**Look:** frozen clouds floating in the sky, white cliffs, blue shadows, howling wind.
-
-**Story beats:**
-
-1. **The secret.** Before landing, a message arrives: Professor Brand is dying. Adult Murph reveals his last words. He solved his equation long ago and knew the plan to lift everyone off Earth could never work without data from inside the black hole. The real plan was only to start a new colony.
-   - **Adult Murph:** "He let you go knowing you'd never come back for us."
-2. **The rescue.** The crew digs Mann out of his sleep pod. He is warm and grateful, and says his planet is perfect for a colony.
-3. **The walk (gameplay).** Mann leads Cooper across the ice to "show him the surface." At the cliff edge, he smashes Cooper's helmet visor and leaves him to suffocate.
-   - **Mann:** "I faked the data. I couldn't die alone out here. I'm sorry."
-4. **Survival (gameplay).** An air meter drains. The player crawls toward the robot's signal and reaches Brand in time, while Mann flies off to steal the main ship.
-5. **The explosion.** Back at Mann's camp, a booby-trapped robot explodes and kills Romilly.
-6. **The docking (mini-game).** Mann forces the docking hatch, and the explosion sends the main ship spinning. Cooper must match its spin with the shuttle and dock. Rotation controls, a timing meter, rising alarms.
-   - **Brand:** "That's not possible."
-   - **Cooper:** "It doesn't have to be possible. It has to work."
-
-## Level 5: The Black Hole (about 2–3 minutes)
-
-With fuel too low to reach the last planet, Cooper slingshots the damaged ship around the black hole, then detaches to lighten the load and falls in.
-
-**Look:** the black hole fills the screen, a glowing gold ring bending light around it. Strong bloom, slow camera, deep hum.
-
-**Gameplay:** a short piloting sequence. Keep the ship inside a glowing "safe orbit" path while the counter jumps: the close pass costs 51 years on Earth.
-
-**Story beats:**
-
-1. **The plan.** Cooper explains the slingshot. One robot volunteers to detach and fall in, to send data from inside.
-2. **The sacrifice.** At the closest point, Cooper detaches his shuttle too, to give Brand the extra push. She realizes too late.
-   - **Brand:** "Cooper, what are you doing?"
-   - **Cooper:** "You've got one more planet to check. I've got one more promise to keep."
-3. **The fall.** Brand's ship flies off toward the last planet. Cooper's shuttle breaks apart. He ejects. White light.
-
-## Level 6: The Tesseract (about 5 minutes)
-
-Inside the black hole, Cooper floats in an endless space built from Murph's bedroom across time, realizes he was her "ghost" all along, and sends her the data that saves humanity.
-
-**Look:** an infinite grid of the same bookshelf, repeating in every direction, glowing threads stretching between them. Each shelf shows Murph's room at a different moment. Warm gold light, slow echoing music.
-
-**Gameplay:** float freely through the grid. Hover over a shelf to see which moment it shows (Murph at 10, Murph at 20, Murph at 40). Push books or threads to affect that moment.
-
-**Story beats:**
-
-1. **The realization.** Cooper sees his younger self in Murph's room on the day he left, and screams at himself to stay. Books fall. He understands.
-   - **Cooper:** "It was me. I was the ghost."
-2. **The coordinates (puzzle).** Through the robot's radio, Cooper learns which coordinates his past self needs. The player pushes dust into binary lines on the floor of the storm day, the same pattern decoded in Level 1.
-3. **The data (final puzzle).** The robot has the black hole data. Cooper needs a way to send it that Murph will notice and keep. He finds the watch he gave her and taps the data into its second hand in Morse code. The player matches a short Morse sequence with timed clicks.
-4. **Murph understands.** Cut to adult Murph back at the farm. She has set the corn field on fire to get Tom's family away from the dust. Alone in her old room, she sees the watch's second hand twitching in a pattern.
-   - **Adult Murph:** "It was you. It was always you."
-5. **The collapse.** The tesseract folds in on itself, its job done.
+**The realization:** for twenty years, the voice that kept him going was not the mission. It was her, on channel 9.
 
 ## Ending (about 3 minutes)
 
-Cooper wakes on a giant space station decades later, sees Murph one last time, and flies off to find Brand.
+1. **Home.** Decades later, a slow return. Eli steps off a small transport onto a green, re-planted valley. The colony ships left years ago. Some people stayed to heal the Earth.
+2. **The porch.** The farmhouse has been rebuilt. June is old, in a chair on the porch, the other walkie-talkie in her lap.
+3. **The reunion.** They talk a little. Mostly they sit.
+4. **Final shot.** From the walkie-talkie on her lap, a faint, steady click: Kestrel-2, still sending the way. Then Ward's voice, very far away, from the new world: "Longtide crew, we're down. It's green here." Fade to black.
 
-**Story beats:**
+**Final text card:** "The End." Then the credits, including every free asset and sound used.
 
-1. **Waking up.** Cooper opens his eyes in a hospital room. A doctor tells him he was found floating near Saturn, and that he is 124 years old on paper.
-2. **The station (short walk).** A huge rotating cylinder habitat: fields, houses and a baseball game curving up overhead. Humanity escaped Earth using Murph's solution. The station is named after her. In a corner, Cooper's old farmhouse has been rebuilt as a museum, the truck parked outside.
-3. **The reunion.** Murph is very old, in bed, surrounded by her family.
-   - **Old Murph:** "Nobody believed me. I told them my dad would come back."
-   - **Cooper:** "I promised."
-   - **Old Murph:** "I had my whole life, Dad. Brand is still waiting for hers. Go find her."
-4. **The last flight.** Cooper takes a small ship and a repaired robot and leaves the station.
-5. **Final shot.** On a rocky, habitable planet, Brand sits alone beside a grave, setting up the first colony camp. She takes off her helmet and breathes the air. Fade to black.
+## Build order
 
-**Final text card:** "The End." Then the credits, including every free asset and sound you used.
+1. The Farm: all five scenes playable.
+2. Transit: a text card or short cutscene.
+3. The Tide World: water, the surge, the time counter, the message screen.
+4. The Relay: zero-g movement, the couplings, the radio lag, the choice.
+5. The Ending: the porch.
 
-## 8-hour build order and what to cut
-
-Build the Farm, the Water Planet and the Tesseract first; together they tell the whole story, and the other levels can be text cards until there's time.
-
-1. **Hours 0–2:** the Farm: player, drivable truck, farmhouse, dust, the dialogue system, Murph's room and the dust-lines puzzle.
-2. **Hours 2–4:** the Water Planet: water, the giant wave, the time counter, the cockpit message screen.
-3. **Hours 4–5:** the Tesseract: the repeating bookshelf grid and the watch Morse puzzle.
-4. **Hours 5–6:** the Ending on the station, plus text cards for the Wormhole, Ice Planet and Black Hole.
-5. **Hours 6–7:** sound, bloom, title screen, credits.
-6. **Hours 7–8:** bug fixes. No new features.
-
-**Cut in this order if time runs short:**
-
-1. The docking mini-game and the Ice Planet (keep a text card that tells what happened).
-2. Wormhole flying (use the cutscene).
-3. The drone chase (start the Farm at the dust-lines puzzle).
-4. The station walk in the Ending (go straight to the reunion).
-
-**Next session:** build the Ice Planet and the docking mini-game in full, then the Black Hole slingshot.
+Cut in this order if time runs short: the Transit flight (keep the card), the Relay's zero-g movement (keep the radio dialogue over a cutscene), the Ending's walk (go straight to the porch).
