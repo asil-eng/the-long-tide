@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farm Look-Dev</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #2a1f18; overflow: hidden; }
+    canvas { display: block; }
+    #hud { position: fixed; left: 12px; bottom: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; color: #f3dcc0; opacity: .75; text-shadow: 0 1px 2px #0008; pointer-events: none; }
+    .shot #hud { display: none; }
+  </style>
+</head>
+<body>
+  <div id="hud">loading…</div>
+  <script>if (new URLSearchParams(location.search).has('shot')) document.documentElement.classList.add('shot');</script>
+  <script type="module" src="/src/levels/farm/lookdev.js"></script>
+</body>
+</html>
