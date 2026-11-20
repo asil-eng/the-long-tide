@@ -12,7 +12,7 @@ const PAL = {
 
 function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
-function buildPlant(detail = 1, seed = 7) {
+export function buildPlant(detail = 1, seed = 7) {
   const r = rng(seed);
   const pos = [], col = [], idx = [];
   const H = 2.45;

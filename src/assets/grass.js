@@ -4,7 +4,7 @@ import { patchMaterial, windDepthMaterial } from './materialPatch.js';
 
 function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
-function buildClump(seed = 3) {
+export function buildClump(seed = 3) {
   const r = rng(seed);
   const pos = [], col = [], idx = [];
   const cols = ['#c9ad78', '#b39a62', '#a48a58', '#d4bf8e', '#9a8a5a'].map((c) => new THREE.Color(c));

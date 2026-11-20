@@ -1,0 +1,62 @@
+:root {
+  --ink: #f4e4cc; --ink-dim: #cdb699; --panel: rgba(28, 20, 15, 0.72); --edge: rgba(240, 200, 150, 0.22);
+  --accent: #f0b46e; --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; --mono: ui-monospace, Menlo, monospace;
+}
+html, body { margin: 0; height: 100%; background: #1d1611; overflow: hidden; color: var(--ink); font-family: var(--font); }
+canvas { display: block; }
+#ui { position: fixed; inset: 0; pointer-events: none; z-index: 2; }
+.shot .debug { display: none; }
+
+.hud-hint { position: absolute; left: 50%; bottom: 13%; transform: translateX(-50%); padding: 6px 14px; border-radius: 4px;
+  background: var(--panel); border: 1px solid var(--edge); font: 15px/1.3 var(--font); letter-spacing: .02em; opacity: 0; transition: opacity .25s; }
+.hud-hint.on { opacity: 1; }
+.hud-hint kbd { font: 600 13px var(--mono); padding: 1px 6px; border: 1px solid var(--ink-dim); border-radius: 3px; margin-right: 6px; }
+
+.debug { position: absolute; left: 12px; bottom: 10px; font: 12px/1.4 var(--mono); color: var(--ink); opacity: .7; text-shadow: 0 1px 2px #000a; }
+
+/* objective */
+.objective { position: absolute; left: 28px; top: 24px; max-width: 360px; font: italic 17px/1.35 var(--font); color: var(--ink);
+  text-shadow: 0 1px 3px #000c; opacity: 0; transition: opacity .6s; }
+.objective.on { opacity: .92; }
+.objective small { display: block; font: 600 10px/1 var(--mono); letter-spacing: .18em; color: var(--accent); margin-bottom: 6px; font-style: normal; }
+
+/* dialogue */
+.dialogue { position: absolute; left: 50%; bottom: 7%; width: min(760px, 86vw); transform: translate(-50%, 12px); opacity: 0;
+  transition: opacity .25s, transform .25s; background: var(--panel); border: 1px solid var(--edge); border-radius: 6px; padding: 16px 22px 18px;
+  backdrop-filter: blur(3px); }
+.dialogue.on { opacity: 1; transform: translate(-50%, 0); }
+.dialogue .who { font: 600 11px/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.dialogue .line { font: 20px/1.45 var(--font); min-height: 1.45em; }
+.dialogue .more { position: absolute; right: 14px; bottom: 10px; font: 11px var(--mono); color: var(--ink-dim); opacity: 0; }
+.dialogue.done .more { opacity: .8; animation: blink 1.2s infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+
+/* cinematic */
+.bars::before, .bars::after { content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; transition: height .8s ease; z-index: 1; }
+.bars::before { top: 0; } .bars::after { bottom: 0; }
+.bars.on::before, .bars.on::after { height: 11vh; }
+.subtitle { position: absolute; left: 50%; bottom: 13vh; transform: translateX(-50%); width: min(900px, 90vw); text-align: center;
+  font: 21px/1.4 var(--font); text-shadow: 0 1px 4px #000, 0 0 12px #000a; opacity: 0; transition: opacity .3s; z-index: 2; }
+.subtitle.on { opacity: 1; }
+.subtitle b { font: 600 12px var(--mono); letter-spacing: .18em; color: var(--accent); text-transform: uppercase; margin-right: 10px; }
+.fade { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 1s; z-index: 3; }
+.card { position: absolute; inset: 0; display: grid; place-items: center; z-index: 4; opacity: 0; transition: opacity 1.2s;
+  font: 300 clamp(22px, 3vw, 40px)/1.3 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); text-align: center; }
+.card.on { opacity: 1; }
+
+/* time counter (hidden on the Farm) */
+.timecounter { position: absolute; right: 26px; top: 22px; text-align: right; font: 11px/1.5 var(--mono); letter-spacing: .16em; color: var(--ink-dim);
+  text-shadow: 0 1px 3px #000c; display: none; }
+.timecounter.on { display: block; }
+.timecounter .big { font: 300 34px/1 var(--font); letter-spacing: .02em; color: var(--ink); }
+
+/* title / menu */
+.menu { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: auto; background: radial-gradient(ellipse at 50% 60%, #0000 0%, #000a 100%); z-index: 5; transition: opacity .8s; }
+.menu.hide { opacity: 0; pointer-events: none; }
+.menu h1 { font: 300 clamp(36px, 6vw, 76px)/1 var(--font); letter-spacing: .3em; margin: 0 0 10px; text-transform: uppercase; text-shadow: 0 2px 20px #000; }
+.menu p { margin: 0 0 30px; font: italic 17px var(--font); color: var(--ink-dim); text-align: center; }
+.menu .row { display: flex; gap: 12px; justify-content: center; }
+.menu button { font: 600 12px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--ink); background: var(--panel); border: 1px solid var(--edge);
+  padding: 12px 22px; border-radius: 4px; cursor: pointer; }
+.menu button:hover, .menu button:focus-visible { border-color: var(--accent); outline: none; color: #fff; }
+.menu .keys { margin-top: 26px; font: 12px/1.8 var(--mono); color: var(--ink-dim); text-align: center; }

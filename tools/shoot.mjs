@@ -16,7 +16,7 @@ for (const v of views.split(',')) {
   try { await p.waitForFunction(() => window.__ready === true, null, { timeout: 90000 }); }
   catch { logs.push('[timeout] scene never reported ready'); }
   await p.waitForTimeout(1500);
-  const fps = await p.evaluate(() => document.getElementById('hud')?.textContent);
+  const fps = await p.evaluate(() => (document.getElementById('hud')||document.querySelector('.debug'))?.textContent);
   await p.screenshot({ path: `${outDir}/${v}.png` });
   console.log(`${v}: ${fps}`);
   for (const l of logs.filter((l) => !l.includes('[vite]'))) console.log('  ', l.slice(0, 400));
