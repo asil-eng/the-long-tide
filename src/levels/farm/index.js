@@ -153,7 +153,9 @@ export async function startFarm(game) {
       dialogue.update(dt);
       const cine = cutscenes.running;
       truck.locked = busy();
-      physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot' && !cine) player.update(h, busy() ? lockedInput : input, camera); });
+      const pin = busy() ? lockedInput : input;
+      physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot' && !cine) player.step(h, pin); });
+      if (mode === 'foot' && !cine) player.frame(dt, physics.alpha, pin, camera);
       truck.update(dt, input, mode === 'truck' && !cine ? camera : null);
       cutscenes.update(dt);
       timeCounter.update(dt);

@@ -31,7 +31,10 @@ export async function createPhysics() {
       acc += dt; let n = 0;
       while (acc >= world.timestep && n < 4) { before?.(world.timestep); world.step(); acc -= world.timestep; n++; }
       if (n === 4) acc = 0;
+      return n;
     },
+    /** how far the render time is between the last two fixed steps (0..1), for interpolation */
+    get alpha() { return Math.min(1, acc / world.timestep); },
     ray(from, dir, maxToi, exclude) {
       const hit = world.castRay(new RAPIER.Ray(from, dir), maxToi, true, undefined, undefined, exclude);
       return hit ? hit.timeOfImpact : null;
