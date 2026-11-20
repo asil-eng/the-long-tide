@@ -3,12 +3,16 @@
 </p>
 
 <p align="center">
+  <a href="https://the-long-tide.vercel.app/"><b>▶ Play it now in your browser</b></a>
+</p>
+
+<p align="center">
   <b>A cinematic, story-driven 3D game that runs in your browser.</b><br>
   <sub>Three.js · Rapier physics · hand-built shaders · about 330,000 plants swaying in the wind</sub>
 </p>
 
 <p align="center">
-  <a href="#-play-it"><img alt="Play locally" src="https://img.shields.io/badge/play-localhost%3A5173-e0a060?style=flat-square"></a>
+  <a href="https://the-long-tide.vercel.app/"><img alt="Play in your browser" src="https://img.shields.io/badge/%E2%96%B6%20play%20now-the--long--tide.vercel.app-e0a060?style=flat-square"></a>
   <img alt="Three.js r187" src="https://img.shields.io/badge/three.js-r187-2b2622?style=flat-square">
   <img alt="Rapier 0.21" src="https://img.shields.io/badge/rapier-0.21-2b2622?style=flat-square">
   <img alt="Level 1 playable" src="https://img.shields.io/badge/level%201-playable-6b8a4e?style=flat-square">
@@ -118,6 +122,10 @@ The full story is in [STORY.md](STORY.md). Every line of dialogue is in [src/sto
 </p>
 
 ## 🎮 Play it
+
+**Play online:** **[the-long-tide.vercel.app](https://the-long-tide.vercel.app/)**. Works best in desktop Chrome, Edge or Safari, and the first load takes a few seconds.
+
+### Run it locally
 
 You need [Node.js](https://nodejs.org/) 18 or newer.
 
