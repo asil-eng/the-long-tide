@@ -19,6 +19,8 @@ import { STORY } from '../../story.js';
 import { buildBedroom, ROOM } from './bedroom.js';
 import { createTrample } from '../../systems/trample.js';
 import { distToRoads } from '../../assets/terrain.js';
+import { runFarmStory } from './script.js';
+import { save } from '../../systems/save.js';
 
 export async function startFarm(game) {
   const { scene, camera, renderer, high } = game;
@@ -98,11 +100,12 @@ export async function startFarm(game) {
     indoors = true; player.setPosition(bedroom.spawn, bedroom.spawnFacing);
     world.uFogDensity.value = 0.0005; scene.environmentIntensity = 0.32; audio.setWind(0.12);
     world.uSunDir.value.copy(bedroom.sunDir); player.bounds = bedroom.bounds;
+    const mood = { day: 1, dusk: 0.6, storm: 0.15, night: 0 }[atmo.mode] ?? 1; bedroom.setMood(mood); atmo.sun.intensity *= 0.35 + 0.65 * mood;
     await cutscenes.wait(0.2); cutscenes.setFade(0, '#000', 0.6); input.state.enabled = true;
   }
   async function goOutside() {
     cutscenes.setFade(1, '#000', 0.5); input.state.enabled = false; await cutscenes.wait(0.55);
-    indoors = false; atmo.set(atmo.mode); player.bounds = null;
+    indoors = false; atmo.set(atmo.mode); player.bounds = null; level.onOutside?.();
     const p = SPOTS.houseDoor.clone(); p.y = heightAt(p.x, p.z); player.setPosition(p, Math.PI / 2);
     audio.setWind(0.45);
     await cutscenes.wait(0.2); cutscenes.setFade(0, '#000', 0.6); input.state.enabled = true;
@@ -143,8 +146,32 @@ export async function startFarm(game) {
     }, 600);
   }
 
+  // ---- story: title screen, then the five Farm scenes ----
+  const storyModels = { anims: animGltf };
+  await Promise.all(['porch_table', 'lantern', 'rocking_chair', 'junes_radio', 'walkie', 'probe', 'chainfence', 'floodlight', 'dish', 'crate', 'barrel'].map(async (n) => { storyModels[n] = (await loadModel(n)).scene; }));
+  function startStory(sceneN) { runFarmStory(level, game, storyModels, { startScene: sceneN }).catch((e) => console.error('[story]', e)); }
+  if (!VIEWS[params.get('view')] && params.get('test') !== 'systems') {
+    if (params.has('scene')) setTimeout(() => startStory(+params.get('scene') || 1), 300);
+    else showMenu();
+  }
+  function showMenu() {
+    const saved = save.load();
+    const m = document.createElement('div'); m.className = 'menu';
+    m.innerHTML = `<div><h1>${STORY.title.name}</h1><p>${STORY.title.tagline}</p><div class="row">
+      <button data-a="new">New game</button>${saved?.level === 'farm' && saved.scene > 1 ? `<button data-a="cont">Continue · scene ${saved.scene}</button>` : ''}</div>
+      <div class="keys">WASD move · Shift run · mouse look · E interact / drive · Space brake · G graphics (${game.quality})</div></div>`;
+    game.ui.appendChild(m); input.state.enabled = false;
+    m.addEventListener('click', (e) => {
+      const a = e.target.dataset.a; if (!a) return;
+      m.classList.add('hide'); setTimeout(() => m.remove(), 900); input.state.enabled = true;
+      renderer.domElement.requestPointerLock?.();
+      startStory(a === 'cont' ? saved.scene : 1);
+    });
+  }
+
   let ready = 0;
   const level = {
+    npcs: [], extraUpdate: [], hold: null, onOutside: null,
     grade: FARM_GRADE,
     input, player, physics, farm, atmo, truck, audio, dust, dialogue, cutscenes, triggers, timeCounter,
     get typing() { return dialogue.busy; }, bedroom, goInside, goOutside, get indoors() { return indoors; },
@@ -156,6 +183,10 @@ export async function startFarm(game) {
       const pin = busy() ? lockedInput : input;
       physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot' && !cine) player.step(h, pin); });
       if (mode === 'foot' && !cine) player.frame(dt, physics.alpha, pin, camera);
+      if (level.hold && !cine) { camera.position.copy(level.hold.pos); camera.lookAt(level.hold.look); }
+      for (const n of level.npcs) n.update(dt);
+      for (const f of level.extraUpdate) f(dt, world.uTime.value);
+      scene.userData.camQ = camera.quaternion;
       truck.update(dt, input, mode === 'truck' && !cine ? camera : null);
       cutscenes.update(dt);
       timeCounter.update(dt);
@@ -175,7 +206,7 @@ export async function startFarm(game) {
       const focus = controls ? controls.target.clone().lerp(camera.position, 0.45) : (mode === 'truck' ? truck.position : player.position).clone().lerp(camera.position, 0.3);
       focus.y = indoors ? ROOM.origin.y : heightAt(focus.x, focus.z);
       bedroom.update(world.uTime.value);
-      atmo.update(focus);
+      atmo.update(focus, dt);
       input.endFrame();
       if (++ready === 40) window.__ready = true;
     },

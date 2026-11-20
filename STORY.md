@@ -33,7 +33,7 @@ Golden hour, then a dust storm, then night, then the next morning. The farm vall
 
 **Scene 4. The night drive.** Eli drives the payload to the half-buried observatory at the far end of the valley road. Behind a chain-link fence, under floodlights, Dr. Okafor explains. The crops are failing everywhere. Colony ships are almost ready, but the route to the new world lives in Kestrel-2, and Kestrel is dying. Someone has to fly out and fix it, and Eli is the last pilot who knows that ship.
 
-**Scene 5. The goodbye.** The next morning, June won't open her door. Eli talks to her through it, then leaves one of the pair of walkie-talkies on her bookshelf. He keeps the other, set to channel 9. He drives away. June runs onto the porch too late, holding the walkie-talkie. Weeks later, from the same porch, she watches a launch trail climb over the hills. Fade to white.
+**Scene 5. The goodbye.** The next morning, June sits on her bed facing the window and won't look at him. Eli talks to her back, then leaves one of the pair of walkie-talkies on her bookshelf. He keeps the other, set to channel 9. He drives away. June runs onto the porch too late, holding the walkie-talkie. Weeks later, from the same porch, she watches a launch trail climb over the hills. Fade to white.
 
 ## Level 2: Transit (text card or short cutscene)
 

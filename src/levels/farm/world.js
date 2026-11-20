@@ -35,7 +35,7 @@ export async function buildFarmWorld(scene, { high = true } = {}) {
   const cornRng = rng(5);
   const spacing = high ? 0.34 : 0.48;
   const corn = new TiledScatter(scene, {
-    area: { x0: -176, x1: 176, z0: -176, z1: 176 }, tile: 32, nearDist: high ? 42 : 30, farDist: high ? 230 : 170, lowFraction: high ? 0.32 : 0.22,
+    area: { x0: -176, x1: 176, z0: -176, z1: 176 }, tile: 32, nearDist: high ? 32 : 24, farDist: high ? 230 : 170, lowFraction: high ? 0.32 : 0.22,
     geoHigh: buildPlant(1, 6), geoLow: buildPlant(0, 6), matHigh: cornMat, depthHigh: windDepthMaterial(2.4),
     place: (t, push) => {
       for (const f of layout.fields) {

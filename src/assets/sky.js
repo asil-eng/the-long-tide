@@ -36,6 +36,17 @@ export function createSky({ zenith = '#a97f5e', horizon = '#d9ab82' } = {}) {
         col = mix(col, clc, cl * 0.7);
         // sun: a soft disc smothered by dust plus a broad warm glow
         col += uSunColor * (pow(sd, 900.0) * 6.0 + pow(sd, 40.0) * 0.35 + pow(sd, 6.0) * 0.18);
+        // stars fade in as the sky darkens
+        float night = 1.0 - smoothstep(0.03, 0.12, dot(uZenith, vec3(0.3, 0.59, 0.11)));
+        if (night > 0.0) {
+          vec3 sd3 = floor(d * 420.0);
+          float st = fx_hash13(sd3);
+          float tw = 0.6 + 0.4 * sin(uTime * 2.0 + st * 40.0);
+          col += vec3(0.9, 0.92, 1.0) * step(0.9975, st) * tw * night * smoothstep(0.05, 0.3, h) * 1.6;
+          // a band of the galaxy
+          float band = exp(-pow(dot(d, normalize(vec3(0.4, 0.5, -0.75))) * 3.2, 2.0));
+          col += vec3(0.11, 0.1, 0.13) * band * fx_fbm(vec3(d * 9.0)) * night;
+        }
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }`,

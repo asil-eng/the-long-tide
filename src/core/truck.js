@@ -53,6 +53,22 @@ export class Truck {
     this.driving = false; this.steer = 0; this.throttle = 0; this.rpm = 0;
     this.camPos = V(); this.camInit = false; this.camYaw = 0; this.locked = false;
     this.speed = 0;
+    // headlights (switched on at night)
+    this.lights = [];
+    for (const z of [-0.62, 0.62]) {
+      const l = new THREE.SpotLight('#ffe2b8', 0, 70, 0.48, 0.55, 1.4);
+      l.position.set(3.05, 1.0, z); l.target.position.set(18, -0.6, z * 1.6);
+      this.root.add(l, l.target); this.lights.push(l);
+    }
+    const glowMat = new THREE.SpriteMaterial({ color: '#fff0d6', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending,
+      map: (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, '#fff'); gr.addColorStop(0.25, 'rgba(255,240,210,.6)'); gr.addColorStop(1, 'rgba(255,220,180,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })() });
+    this.glows = [-0.62, 0.62].map((z) => { const s = new THREE.Sprite(glowMat); s.scale.setScalar(0.9); s.position.set(3.12, 1.0, z); this.root.add(s); return s; });
+    this.glowMat = glowMat;
+  }
+
+  setHeadlights(on) {
+    this.lights.forEach((l) => { l.intensity = on ? 60 : 0; l.castShadow = false; });
+    this.glowMat.opacity = on ? 0.9 : 0;
   }
 
   get position() { const t = this.body.translation(); return V(t.x, t.y, t.z); }
@@ -151,7 +167,13 @@ export class Truck {
     if (!this.camInit) { this.camPos.copy(want); this.camInit = true; }
     this.camPos.lerp(want, 1 - Math.exp(-dt * 5));
     camera.position.copy(this.camPos);
-    camera.lookAt(p.x + f.x * 3, p.y + 1.6, p.z + f.z * 3);
+    const look = new THREE.Vector3(p.x + f.x * 3, p.y + 1.6, p.z + f.z * 3);
+    if (this.lookExtra) { // keep a chase target (the balloon) in frame without losing the truck
+      const toT = this.lookExtra.clone().sub(p); toT.y = 0;
+      if (toT.dot(f) > 0) { look.lerp(this.lookExtra, 0.18); look.y = Math.min(look.y, p.y + 4.2); }
+    }
+    this.lookSm = this.lookSm ? this.lookSm.lerp(look, 1 - Math.exp(-dt * 6)) : look.clone();
+    camera.lookAt(this.lookSm);
     camera.fov = THREE.MathUtils.damp(camera.fov, 50 + Math.min(sp, 30) * 0.35, 3, dt); camera.updateProjectionMatrix();
   }
 }

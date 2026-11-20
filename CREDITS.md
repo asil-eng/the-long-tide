@@ -19,6 +19,11 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | bedroom_bed.glb | Single wooden bed | franckross | https://sketchfab.com/3d-models/single-wooden-bed-c7bea79b8c7a4b7c9ec5eadfa2529b9a | Modified: rescaled |
 | bedroom_desk.glb | Vintage Wooden Workdesk | Poring | https://sketchfab.com/3d-models/vintage-wooden-workdesk-f1eddff773a740b78110610cef248093 | Modified: rescaled |
 | anims.glb | Basic Human Male (idle/walk/run/sit clips, retargeted onto player.glb) | enzinogenie | https://sketchfab.com/3d-models/basic-human-male-f1775be7b1b94e4ea40d25287585ee69 | Modified: clips retargeted by bone name, made in-place |
+| walkie.glb | Portable Radio – Walkie Talkie (Dual Band) | KrylatovKim (oblivionhero) | https://sketchfab.com/3d-models/portable-radio-walkie-talkie-dual-band-0b44c0e7c01c4ba883d748640c022d8e | Modified: rescaled |
+| probe.glb | Real Weather balloon Probe "BILBHY" | BlueMesh | https://sketchfab.com/3d-models/real-weather-balloon-probe-bilbhy-956fec6b85ae4af6b46a487289e2a200 | Modified: decimated 43k→12k, rescaled (balloon envelope built in code) |
+| chainfence.glb | Modular Chain Link Fence Set | FrodoUndead | https://sketchfab.com/3d-models/modular-chain-link-fence-set-bd85a8005ff0403cab2f1e9845016b8f | Modified: rescaled |
+| floodlight.glb | Flood light 02 | Chamod1999 (Chamodp) | https://sketchfab.com/3d-models/flood-light-02-95ad365a60434015a8700efbdaa90893 | Modified: rescaled |
+| dish.glb | Satellite Comms | Duane's Mind (duanesmind) | https://sketchfab.com/3d-models/satellite-comms-4be56951da39429a963ee12140bbff57 | Modified: rescaled |
 | player.glb | Hendrik the engineer who became a sheep herder | ustoopia | https://sketchfab.com/3d-models/hendrik-the-engineer-who-became-a-sheep-herder-84d6704563734976982f0d3491d726c6 | Modified: kept the T-pose rig only, rescaled to 1.8 m; animation from anims.glb |
 
 ## Poly Haven (CC0)
@@ -50,7 +55,10 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | alarm_clock.glb | Alarm Clock 01 | Yann Kervran, James Ray Cock | https://polyhaven.com/a/alarm_clock_01 |
 | books.glb | Book Encyclopedia Set 01 | John Malcolm | https://polyhaven.com/a/book_encyclopedia_set_01 |
 | lantern.glb | Lantern 01 | Rajil Jose Macatangay | https://polyhaven.com/a/Lantern_01 |
+| junes_radio.glb | Cassette Player | Oday Abuzaeed | https://polyhaven.com/a/cassette_player |
+| rocking_chair.glb | Rocking Chair 01 | Jorge Camacho | https://polyhaven.com/a/Rockingchair_01 |
+| porch_table.glb | Wooden Table 01 | Ethan Place | https://polyhaven.com/a/WoodenTable_01 |
 | dresser.glb | Vintage Wooden Drawer 01 | James Ray Cock | https://polyhaven.com/a/vintage_wooden_drawer_01 |
 
 ## Created in code for this project
-Terrain, hills and road network, corn and grass (procedural, instanced, LOD tiles), sky dome, height fog, dust particles and wheel dust trails, wind shader, dust/sun-fade material shader, color grade, the bedroom room shell, curtains, window light and children's drawings, all audio (synthesized engine, wind, footsteps, UI).
+Story characters' clothing (placeholder shader on the Basic Human Male mesh), weather balloon envelope, observatory dome and bunker, launch trail, tape puzzle UI. Terrain, hills and road network, corn and grass (procedural, instanced, LOD tiles), sky dome, height fog, dust particles and wheel dust trails, wind shader, dust/sun-fade material shader, color grade, the bedroom room shell, curtains, window light and children's drawings, all audio (synthesized engine, wind, footsteps, UI).

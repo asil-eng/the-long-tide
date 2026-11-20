@@ -30,10 +30,32 @@ export function createFarmAtmosphere(renderer, scene, { high = true } = {}) {
 
   const presets = {
     day: { sun: '#ffad6a', sunI: 7.5, env: 0.26, fog: '#d2a682', fogSun: '#f6cc92', density: 0.0065, falloff: 0.06, zenith: '#8c6e5e', horizon: '#e4b68c', dust: '#c7a985' },
-    storm: { sun: '#e0915a', sunI: 3.0, env: 0.3, fog: '#b98a66', fogSun: '#d8a874', density: 0.03, falloff: 0.03, zenith: '#7a5a48', horizon: '#c08e68', dust: '#b89474' },
-    night: { sun: '#8fa6d6', sunI: 0.55, env: 0.05, fog: '#2a2f3d', fogSun: '#3b4052', density: 0.006, falloff: 0.05, zenith: '#0b0e17', horizon: '#232838', dust: '#5c5a5c' },
+    storm: { sun: '#d08452', sunI: 2.2, env: 0.28, fog: '#a8795a', fogSun: '#c99a6c', density: 0.05, falloff: 0.022, zenith: '#7a5a48', horizon: '#c08e68', dust: '#b89474' },
+    dusk: { sun: '#ff8a4c', sunI: 5.0, env: 0.2, fog: '#c9876a', fogSun: '#f2a874', density: 0.006, falloff: 0.055, zenith: '#5a4a5a', horizon: '#e09a72', dust: '#b8977a' },
+    night: { sun: '#9fb4e0', sunI: 1.5, env: 0.11, fog: '#30384c', fogSun: '#48506a', density: 0.005, falloff: 0.05, zenith: '#0c111d', horizon: '#2c3448', dust: '#6a6a72' },
   };
   let mode = 'day';
+  let tween = null;
+  /** blend smoothly to another preset over `secs` */
+  function transition(name, secs = 3) {
+    const from = snapshot(); set(name); const to = snapshot(); apply(from); mode = name;
+    tween = { from, to, t: 0, secs };
+  }
+  function snapshot() {
+    return { sun: sun.color.clone(), sunI: sun.intensity, env: scene.environmentIntensity, fog: world.uFogColor.value.clone(), fogSun: world.uFogSunColor.value.clone(),
+      density: world.uFogDensity.value, falloff: world.uFogFalloff.value, zenith: sky.material.uniforms.uZenith.value.clone(), horizon: sky.material.uniforms.uHorizon.value.clone(),
+      dust: world.uDustColor.value.clone(), dir: world.uSunDir.value.clone() };
+  }
+  function apply(s) {
+    sun.color.copy(s.sun); sun.intensity = s.sunI; scene.environmentIntensity = s.env; world.uSunColor.value.copy(s.sun);
+    world.uFogColor.value.copy(s.fog); world.uFogSunColor.value.copy(s.fogSun); world.uFogDensity.value = s.density; world.uFogFalloff.value = s.falloff;
+    sky.material.uniforms.uZenith.value.copy(s.zenith); sky.material.uniforms.uHorizon.value.copy(s.horizon); world.uDustColor.value.copy(s.dust); world.uSunDir.value.copy(s.dir);
+  }
+  function lerpSnap(a, b, k) {
+    const c = (x, y) => x.clone().lerp(y, k), n = (x, y) => x + (y - x) * k;
+    return { sun: c(a.sun, b.sun), sunI: n(a.sunI, b.sunI), env: n(a.env, b.env), fog: c(a.fog, b.fog), fogSun: c(a.fogSun, b.fogSun), density: n(a.density, b.density),
+      falloff: n(a.falloff, b.falloff), zenith: c(a.zenith, b.zenith), horizon: c(a.horizon, b.horizon), dust: c(a.dust, b.dust), dir: c(a.dir, b.dir).normalize() };
+  }
   function set(name) {
     const p = presets[name]; mode = name;
     sun.color.set(p.sun); sun.intensity = p.sunI; scene.environmentIntensity = p.env;
@@ -47,9 +69,10 @@ export function createFarmAtmosphere(renderer, scene, { high = true } = {}) {
   set('day');
 
   return {
-    sun, sky, dust, set, get mode() { return mode; },
+    sun, sky, dust, set, transition, get mode() { return mode; },
     setEnabled(on) { sky.visible = on; dust.visible = on; sun.visible = on; },
-    update(focus) {
+    update(focus, dt = 0) {
+      if (tween) { tween.t += dt; const k = Math.min(1, tween.t / tween.secs); apply(lerpSnap(tween.from, tween.to, k * k * (3 - 2 * k))); if (k >= 1) tween = null; }
       const f = focus.clone();
       sun.target.position.copy(f);
       sun.position.copy(f).addScaledVector(world.uSunDir.value, 80);

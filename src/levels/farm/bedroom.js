@@ -168,9 +168,11 @@ export async function buildBedroom(scene, loadModel) {
     group, colliders,
     spawn: new THREE.Vector3(O.x - w / 2 + 0.7, O.y, O.z + (zB + zC) / 2), spawnFacing: Math.PI / 2,
     door: { x: O.x - w / 2 + 0.45, z: O.z + (zB + zC) / 2, r: 0.75 },
-    shelf: shelf.b, floorCenter: new THREE.Vector3(O.x + 0.5, O.y, O.z + 0.6),
+    shelf: shelf.b, deskTop, floorCenter: new THREE.Vector3(O.x + 0.5, O.y, O.z + 0.6),
     bounds: { x0: O.x - w / 2 + 0.2, x1: O.x + w / 2 - 0.2, z0: O.z - d / 2 + 0.2, z1: O.z + d / 2 - 0.2, y0: O.y + 0.3, y1: O.y + h - 0.15 },
     sunDir: new THREE.Vector3(-0.2, 0.62, 0.76).normalize(),
+    /** 1 = clear sun through the window, ~0.2 = storm, 0 = night */
+    setMood(k) { beamMat.uniforms.uColor.value.set('#ffb877').multiplyScalar(k); fill.intensity = 3 + 2.5 * k; },
     update(t) {
       beamMat.uniforms.uTime.value = t;
       for (const c of curtains) {

@@ -104,9 +104,9 @@ export const STORY = {
     morningCard: 'The next morning',
     objectiveDoor: 'Talk to June.',
     doorDialogue: [
-      { who: C.eli, text: 'June. Open the door.' },
+      { who: C.eli, text: 'June. Look at me.' },
       { who: C.june, text: 'No.' },
-      { who: C.eli, text: 'I can\'t fix this from the porch, kid.' },
+      { who: C.eli, text: 'I can\'t fix this from the doorway, kid.' },
       { who: C.june, text: 'You said the clicks would still be real tomorrow. You didn\'t say you\'d be gone tomorrow.' },
       { who: C.eli, text: 'I\'m leaving you one of these. The other one comes with me. Channel nine.' },
       { who: C.june, text: 'They only reach as far as the fence.' },
