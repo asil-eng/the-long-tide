@@ -1,145 +1,207 @@
-# The Long Tide
+<p align="center">
+  <img src="docs/screenshots/banner.jpg" alt="The Long Tide: a dirt road and power lines running into a dusty corn valley at sunset" width="100%">
+</p>
 
-*Channel nine. Always channel nine.*
+<p align="center">
+  <b>A cinematic, story-driven 3D game that runs in your browser.</b><br>
+  <sub>Three.js · Rapier physics · hand-built shaders · about 330,000 plants swaying in the wind</sub>
+</p>
 
-A story-driven, third-person 3D game that runs in the browser. You play Eli Harlan, a farmer and former test pilot, on a dying, dust-choked farm. A strange clicking on his daughter June's homemade radio turns out to be a distress call from Kestrel-2, a deep-space relay he once flew out of the solar system. It's the only thing that can guide humanity's colony ships to a new world, and it's failing.
+<p align="center">
+  <a href="#-play-it"><img alt="Play locally" src="https://img.shields.io/badge/play-localhost%3A5173-e0a060?style=flat-square"></a>
+  <img alt="Three.js r187" src="https://img.shields.io/badge/three.js-r187-2b2622?style=flat-square">
+  <img alt="Rapier 0.21" src="https://img.shields.io/badge/rapier-0.21-2b2622?style=flat-square">
+  <img alt="Level 1 playable" src="https://img.shields.io/badge/level%201-playable-6b8a4e?style=flat-square">
+  <img alt="Assets CC0 and CC-BY" src="https://img.shields.io/badge/assets-CC0%20%2F%20CC--BY-8a7a66?style=flat-square">
+</p>
 
-Built with Three.js and Rapier. It aims for a realistic, cinematic, lived-in look: golden-hour haze, dust on everything, corn that moves in the wind and parts when you drive through it.
+---
 
-![Golden hour on the farm](docs/lookdev/wide.png)
+## The story
 
-## Status
+The crops are failing. The sky is the colour of rust. On a dust-choked farm at the edge of a dying valley, **Eli Harlan**, a farmer who used to fly test ships, eats supper on the porch because the kitchen is full of grit.
 
-| Level | State |
-| --- | --- |
-| 1. The Farm | **Playable**: five scenes, about 10 minutes |
-| 2. Transit | Story written, text card |
-| 3. The Tide World | Story written |
-| 4. The Relay | Story written |
-| Ending | Story written |
+His daughter **June**, ten years old, has built a radio out of salvaged parts. It keeps picking up a slow, repeating click. Three slow, two fast. Every time.
 
-The full story is in [STORY.md](STORY.md). All dialogue lives in [src/story.js](src/story.js).
+It's a distress call from **Kestrel-2**, a deep-space relay Eli flew out of the solar system eleven years ago. It holds the only route to a new world for humanity's colony ships, and it's dying.
 
-## Play it
+Out there, time runs slow for him and fast for her. The only line between them is a pair of old walkie-talkies, set to **channel nine**.
+
+> *"You said the clicks would still be real tomorrow. You didn't say you'd be gone tomorrow."*
+
+<p align="center">
+  <img src="docs/screenshots/porch_wide.jpg" alt="The white farmhouse at golden hour with the family gathered on the porch" width="100%">
+</p>
+
+## Gameplay
+
+<p align="center">
+  <img src="docs/screenshots/corn_drive.gif" alt="The pickup truck ploughing through a cornfield, leaving a flattened track and twin dust plumes" width="80%"><br>
+  <sub><i>Drive anywhere. The corn bends away from the truck, stays flattened in its track, and slowly stands back up.</i></sub>
+</p>
+
+### Level 1: The Farm (playable, about 10 minutes)
+
+| | |
+| :-- | :-- |
+| <img src="docs/screenshots/porch_dialogue.jpg" alt="Dialogue on the porch"> | **1. Supper on the porch.** A dust advisory on the kitchen radio. June swears the clicking means something. Then Wes spots something silver sinking over the east field. |
+| <img src="docs/screenshots/corn_drive.jpg" alt="Truck in the corn"> | **2. The balloon chase.** Take the truck and chase a lost weather balloon straight through the corn, following a signal meter on the dash. |
+| <img src="docs/screenshots/storm.jpg" alt="Dust storm over the farmhouse"> | **3. The storm…** A wall of dust rolls over the farm. Get home before it hits. |
+| <img src="docs/screenshots/puzzle.jpg" alt="The tape puzzle in June's room"> | **…and the tape.** In June's room, line up the balloon's tape log with her live radio until the marks match, and decode the message. |
+| <img src="docs/screenshots/observatory.jpg" alt="The observatory at night"> | **4. The night drive.** Headlights, stars, and a floodlit observatory half-buried in the hills, where Dr. Okafor explains what Kestrel's death will cost. |
+| <img src="docs/screenshots/family.jpg" alt="The family in the yard"> | **5. The goodbye.** June won't look at him. Eli leaves one walkie-talkie on her bookshelf and keeps the other. |
+
+### Still to come
+
+| Level | |
+| :-- | :-- |
+| **Transit** | Two years of sleep, and a slingshot around Jupiter into the outer dark. |
+| **The Tide World** | A shallow ocean moon where every hour costs five years at home. A surge on the horizon. Twenty years of messages from June in one sitting. |
+| **The Relay** | A zero-g repair of the dying beacon, with June, now an engineer, talking him through it across a four-minute radio lag. |
+| **Ending** | A green valley, decades later. An old woman on a rebuilt porch, a walkie-talkie in her lap. |
+
+The full story is in [STORY.md](STORY.md). Every line of dialogue is in [src/story.js](src/story.js).
+
+## The world
+
+<p align="center">
+  <img src="docs/screenshots/aerial.jpg" alt="Aerial view of the farm valley: fields, dirt roads, the farmhouse, barn and water tower, ringed by hills" width="100%"><br>
+  <sub><i>A 400 × 400 m valley, built in code and fully explorable on foot or by truck.</i></sub>
+</p>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**🌾 Living landscape**
+- About 330,000 corn plants and 66,000 grass clumps, instanced in tiles with distance level of detail
+- A noise-driven wind shader with gusts and a different sway per plant
+- Plants are pushed aside by the truck and the player, and stay trampled in the truck's track
+- Procedural terrain, a road network with tyre ruts, and furrowed fields
+
+**🎥 Cinematic look**
+- HDRI lighting and a low, warm sun with soft shadows
+- Analytic height fog that glows toward the sun
+- N8AO ambient occlusion, bloom, ACES tone mapping, a custom teal-and-amber color grade, vignette and SMAA
+- Golden hour, dust storm, dusk and a starry night, with smooth transitions
+
+</td>
+<td width="50%" valign="top">
+
+**🧍 Characters and movement**
+- Realistic scanned characters with faces. Unrigged scans get a skeleton fitted automatically
+- A world-space retargeting system that plays one animation set across different rigs
+- Motion-captured walking, speed-matched so the feet never skate, plus momentum, leaning into turns and foot placement on uneven ground
+
+**🛻 The truck**
+- A Rapier ray-cast vehicle with suspension, steering and spinning wheels
+- Dust plumes, headlights, a chase camera and drag when ploughing through corn
+
+**🔊 Sound**
+- All synthesized live: wind gusts, footsteps, a diesel engine and leaves rustling in the corn
+
+</td>
+</tr>
+</table>
+
+<p align="center">
+  <img src="docs/screenshots/road.jpg" alt="Sunset over the dirt road, with power lines receding into the haze" width="100%">
+</p>
+
+## 🎮 Play it
 
 You need [Node.js](https://nodejs.org/) 18 or newer.
 
 ```bash
+git clone https://github.com/asil-eng/the-long-tide.git
+cd the-long-tide
 npm install
 npx vite
 ```
 
-Then open http://localhost:5173/ and click **New game**.
+Open **http://localhost:5173/** and click **New game**. Your progress saves at the start of each scene, and **Continue** picks up where you left off.
+
+<p align="center">
+  <img src="docs/screenshots/title.jpg" alt="Title screen" width="70%">
+</p>
 
 | Key | Action |
-| --- | --- |
-| W A S D | Move |
-| Shift | Run |
-| Mouse | Look (click the game to capture the mouse) |
-| E | Interact, get in or out of the truck |
-| Space | Brake / advance dialogue |
-| R | Reset the truck if it flips |
-| G | Switch between High and Low graphics |
-| Esc | Skip a cutscene |
+| :-: | :-- |
+| <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> | Move |
+| <kbd>Shift</kbd> | Run |
+| <kbd>Mouse</kbd> | Look (click the game to capture the mouse) |
+| <kbd>E</kbd> | Interact, get in or out of the truck |
+| <kbd>Space</kbd> | Brake, advance dialogue |
+| <kbd>R</kbd> | Reset the truck |
+| <kbd>G</kbd> | Switch between High and Low graphics |
+| <kbd>Esc</kbd> | Skip a cutscene |
 
-Your progress saves at the start of each scene, and **Continue** on the title screen picks up from there.
-
-### Developer shortcuts
+<details>
+<summary><b>Developer shortcuts</b></summary>
 
 Add these to the address:
 
-- `?scene=1` … `?scene=5` jumps straight to a scene.
-- `?q=low` or `?q=high` forces a graphics setting.
-- `?view=aerial` (or `yard`, `barn`, `road`, `hills`) opens a free camera over the valley.
-- `/lookdev-farm.html` opens the original look-development test scene.
+| Parameter | Does |
+| :-- | :-- |
+| `?scene=1` … `?scene=5` | Jump straight to a Farm scene |
+| `?q=low` / `?q=high` | Force a graphics setting |
+| `?view=aerial` (or `yard`, `barn`, `road`, `hills`) | Free camera over the valley |
+| `/lookdev-farm.html` | The original look-development test scene |
 
-## Level 1: The Farm
+</details>
 
-1. **Supper on the porch.** A dust warning on the radio, and June's radio picking up a repeating click.
-2. **The balloon chase.** Chase a sinking weather balloon across the fields in the truck, straight through the corn, following a signal meter.
-3. **The storm and the tape.** A dust storm rolls in. In June's room, line up the balloon's tape log with her radio to decode the message.
-4. **The night drive.** Take the payload to a floodlit, half-buried observatory at the edge of the valley.
-5. **The goodbye.** June won't look at him. Eli leaves her one of a pair of walkie-talkies on channel 9, then drives away.
+<details>
+<summary><b>Automated screenshots and play-throughs</b></summary>
 
-## What's in it
-
-**World**
-- 400 × 400 m farm valley ringed by hills, built in code: terrain, a road network painted into a mask texture, tyre ruts, furrowed fields.
-- About 330,000 corn plants and 66,000 grass clumps, instanced in 32 m tiles with distance level of detail.
-- Corn and grass sway in a noise-driven wind shader. They bend away from the truck and the player, and the truck leaves a flattened track that slowly stands back up.
-
-**Look**
-- HDRI environment lighting, a low warm sun with soft shadows, and analytic height fog tinted toward the sun.
-- A shared material shader adds dust to top surfaces, dirt on lower parts and sun-fading to every model.
-- Post-processing on High: N8AO ambient occlusion, bloom, ACES tone mapping, a custom color grade (teal shadows, amber highlights), vignette and SMAA.
-- Weather and time of day: golden hour, a dust storm, night with stars, and dusk, with smooth transitions.
-
-**Characters and movement**
-- Realistic scanned characters for June, Wes, Ada and Dr. Okafor. June and Ada were unrigged scans, so the build tools fit and bind a skeleton to them automatically.
-- A world-space retargeting system plays the same animations on different rigs (Mixamo, RenderPeople, auto-rigged), whether they're in an A-pose or a T-pose.
-- Motion-captured walk and an upright jog for the player, speed-matched so the feet don't skate. On top: momentum, leaning into turns, head look and foot placement on uneven ground.
-
-**Vehicle**
-- A Rapier ray-cast pickup with suspension, spinning and steering wheels, speed-sensitive steering, headlights, dust plumes from the rear tyres and a chase camera.
-
-**Systems**
-- Dialogue box with a typing effect, cutscenes (camera paths, letterbox bars, timed subtitles, optional voice files), trigger zones, an objective HUD, checkpoints, and a time-counter HUD for the later levels.
-
-**Sound**
-- All synthesized in WebAudio: wind gusts, footsteps, a diesel-style engine, leaves rustling in the corn, and ambient music pads.
-
-## Project layout
-
-```
-src/
-  main.js              entry point and render loop
-  story.js             every line of dialogue and on-screen text
-  core/                renderer and post-processing, physics, input, player, truck, retargeting
-  systems/             dialogue, cutscenes, triggers, HUD, audio, save, trample map, time counter
-  assets/              code-built assets: terrain, corn, grass, sky, dust, balloon, characters,
-                       and the shared dust/fog/wind material shader
-  levels/farm/         world layout, atmosphere, bedroom, observatory, puzzle, story script
-public/
-  models/              optimized .glb models (meshopt + WebP textures)
-  textures/ hdri/      Poly Haven PBR textures and HDRIs
-tools/                 Playwright scripts for screenshots and scripted play-throughs
-docs/lookdev/          look-development screenshots
-```
-
-## Tech
-
-- [Three.js](https://threejs.org/) for rendering
-- [Rapier](https://rapier.rs/) (`@dimforge/rapier3d-compat`) for physics, the character controller and the vehicle
-- [postprocessing](https://github.com/pmndrs/postprocessing) and [N8AO](https://github.com/N8python/n8ao) for post effects
-- [Vite](https://vitejs.dev/) for the dev server
-- [Playwright](https://playwright.dev/) for automated screenshots and play-throughs
-- [Blender](https://www.blender.org/) and [glTF-Transform](https://gltf-transform.dev/) for preparing models (scaling, decimating, rigging, compressing)
-
-Plain JavaScript ES modules, with no framework.
-
-### Testing
-
-With the dev server running, these capture screenshots in the headless browser:
+With the dev server running:
 
 ```bash
 node tools/shoot.mjs shots lookdev-farm.html corn,road,wide high
 node tools/play.mjs shots "scene=2" "wait:2000;;down:KeyW;;wait:1500;;shot:walk"
 ```
 
-`play.mjs` takes a `;;`-separated list of steps: `wait:ms`, `down:Key`, `up:Key`, `tap:Key`, `shot:name`, `eval:js` and `until:js`.
+`play.mjs` takes a `;;`-separated list of steps: `wait:ms`, `down:Key`, `up:Key`, `tap:Key`, `shot:name`, `eval:js` and `until:js`. It prints the fps at each shot and any console errors.
+
+</details>
+
+## Under the hood
+
+```
+src/
+├── main.js             entry point and render loop
+├── story.js            every line of dialogue and on-screen text
+├── core/               renderer and post-processing, physics, input, player, truck, retargeting
+├── systems/            dialogue, cutscenes, triggers, HUD, audio, save, trample map, time counter
+├── assets/             code-built assets: terrain, corn, grass, sky, dust, balloon, characters,
+│                       and the shared dust / fog / wind material shader
+└── levels/farm/        world layout, atmosphere, bedroom, observatory, tape puzzle, story script
+public/                 optimized models (meshopt + WebP), Poly Haven textures and HDRIs
+tools/                  Playwright tools, plus the Blender asset pipeline (prep, auto-rig, cleanup)
+```
+
+**Built with** [Three.js](https://threejs.org/) · [Rapier](https://rapier.rs/) · [postprocessing](https://github.com/pmndrs/postprocessing) · [N8AO](https://github.com/N8python/n8ao) · [Vite](https://vitejs.dev/) · [Playwright](https://playwright.dev/) · [Blender](https://www.blender.org/) · [glTF-Transform](https://gltf-transform.dev/)
+
+Plain JavaScript ES modules, with no framework.
+
+Contributing or picking up the remaining levels? Start with [AGENTS.md](AGENTS.md) for the full code map and roadmap, and [CLAUDE.md](CLAUDE.md) for the art direction.
 
 ## Credits
 
-All third-party models, textures and HDRIs are free assets under **CC0** (Poly Haven) or **CC-BY 4.0** (Sketchfab). Every asset, its author, its source link and what was changed is listed in [CREDITS.md](CREDITS.md). CC-BY authors will also appear on the in-game credits screen.
+All third-party models, textures and HDRIs are free assets under **CC0** ([Poly Haven](https://polyhaven.com/)) or **CC-BY 4.0** ([Sketchfab](https://sketchfab.com/)). Every asset, its author, its source and what was changed is listed in **[CREDITS.md](CREDITS.md)**.
 
 The story, dialogue, shaders, code-built assets and all audio were made for this project.
 
-## Setting up assets yourself
+<details>
+<summary><b>Fetching more assets</b></summary>
 
-The prepared models are already in `public/models`, so you don't need anything else to play. If you want to fetch more assets from Sketchfab, put your API token in a `.env` file in the project root:
+The prepared models are already in `public/models`, so you don't need anything else to play. To download more from Sketchfab, put your API token in a `.env` file in the project root:
 
 ```
 SKETCHFAB_TOKEN=your_token_here
 ```
 
 `.env` is in `.gitignore`, so it is never committed.
+
+</details>
+
+<p align="center"><br><i>Channel nine. Always channel nine.</i></p>
