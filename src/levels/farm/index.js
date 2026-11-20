@@ -17,12 +17,14 @@ import { createTriggers } from '../../systems/triggers.js';
 import { createTimeCounter } from '../../systems/timecounter.js';
 import { STORY } from '../../story.js';
 import { buildBedroom, ROOM } from './bedroom.js';
+import { createTrample } from '../../systems/trample.js';
+import { distToRoads } from '../../assets/terrain.js';
 
 export async function startFarm(game) {
   const { scene, camera, renderer, high } = game;
   const params = new URLSearchParams(location.search);
   const atmo = createFarmAtmosphere(renderer, scene, { high });
-  const [farm, physics, playerGltf, truckGltf] = await Promise.all([buildFarmWorld(scene, { high }), createPhysics(), loadModel('player'), loadModel('truck')]);
+  const [farm, physics, playerGltf, truckGltf, animGltf] = await Promise.all([buildFarmWorld(scene, { high }), createPhysics(), loadModel('player'), loadModel('truck'), loadModel('anims')]);
   physics.addHeightfield(heightAt);
   physics.addStatic(farm.colliders);
   const bedroom = await buildBedroom(scene, loadModel);
@@ -33,6 +35,7 @@ export async function startFarm(game) {
   const spawn = SPOTS.playerSpawn.clone(); spawn.y = heightAt(spawn.x, spawn.z);
   const player = new Player(game, playerGltf.scene, physics, spawn);
   player.setPosition(spawn, Math.PI * 0.6);
+  player.setClips(animGltf.scene, animGltf.animations);
   game.player = player;
 
   const audio = game.audio = createAudio();
@@ -50,6 +53,32 @@ export async function startFarm(game) {
   });
   const truck = new Truck(game, truckModel, physics, audio, dust, SPOTS.truckSpawn, 0.85 + Math.PI);
   game.truck = truck;
+
+  // ---- plants react to the truck and the player ----
+  const trample = createTrample({ size: 512, extent: 200 });
+  const rustle = audio.createRustle();
+  const inCorn = (x, z) => farm.layout.fields.some((f) => x > f.x0 && x < f.x1 && z > f.z0 && z < f.z1) && distToRoads(farm.layout, x, z) > 1.2;
+  function updatePlants(dt) {
+    let rust = 0;
+    const tp = truck.position, tf = truck.forward.setY(0).normalize(), tsp = Math.abs(truck.speed);
+    const moving = tsp > 0.6;
+    // nose pushes plants ahead and to the sides, the body keeps them down underneath
+    const nose = tp.clone().addScaledVector(tf, 2.9);
+    trample.setPusher(0, nose, 2.3, tf.clone().multiplyScalar(Math.sign(truck.speed) || 1), moving ? 1 : 0.55);
+    trample.setPusher(1, tp, 3.3, tf, 0.9);
+    if (moving) {
+      trample.stamp(tp.x, tp.z, tf.x * Math.sign(truck.speed || 1), tf.z * Math.sign(truck.speed || 1), 3.0, 1.25, 1);
+      if (inCorn(nose.x, nose.z)) rust = Math.min(1.4, tsp / 9);
+    }
+    truck.cornDrag = inCorn(nose.x, nose.z) && moving ? 0.35 : 0;
+    if (mode === 'foot') {
+      const pp = player.position, ps = player.actualSpeed || 0;
+      trample.setPusher(2, pp, 0.85, player.moveDir || null, 0.75);
+      if (ps > 0.4 && inCorn(pp.x, pp.z)) rust = Math.max(rust, Math.min(0.7, ps / 6));
+    } else trample.setPusher(2, null, 0);
+    rustle.set(rust);
+    trample.update(dt);
+  }
 
   // interaction hint
   const hint = document.createElement('div'); hint.className = 'hud-hint'; game.ui.appendChild(hint);
@@ -129,6 +158,7 @@ export async function startFarm(game) {
       cutscenes.update(dt);
       timeCounter.update(dt);
       dust.update(dt);
+      updatePlants(dt);
       // E: get in / out of the truck
       const near = mode === 'foot' && player.position.distanceTo(truck.doorPoint.setY(player.position.y)) < 2.6 && Math.abs(truck.speed) < 2;
       const zoneHint = mode === 'foot' && !busy() ? triggers.update(player.position) : null;

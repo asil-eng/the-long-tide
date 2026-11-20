@@ -13,7 +13,7 @@ page.on('console', (m) => { if (m.type() !== 'debug') logs.push(`[${m.type()}] $
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
 await page.goto(`http://[::1]:5173/index.html?shot&${query}`, { waitUntil: 'load' });
 try { await page.waitForFunction(() => window.__ready === true, null, { timeout: 120000 }); } catch { logs.push('[timeout] not ready'); }
-for (const step of steps.split(';').map((s) => s.trim()).filter(Boolean)) {
+for (const step of steps.split(';;').map((s) => s.trim()).filter(Boolean)) {
   const i = step.indexOf(':'); const op = step.slice(0, i), arg = step.slice(i + 1);
   if (op === 'wait') await page.waitForTimeout(+arg);
   else if (op === 'down') await page.keyboard.down(arg);

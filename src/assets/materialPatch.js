@@ -17,7 +17,17 @@ export const world = {
   uWindDir: { value: new THREE.Vector2(0.92, 0.38).normalize() },
   uWindStrength: { value: 1.0 },
   uDustColor: { value: new THREE.Color('#c9ab88') },
+  // things that push plants aside: xyz = position, w = radius (0 = off); dir: xy = travel dir, z = strength
+  uPush: { value: [0, 1, 2, 3].map(() => new THREE.Vector4(0, 0, 0, 0)) },
+  uPushDir: { value: [0, 1, 2, 3].map(() => new THREE.Vector4(0, 0, 0, 0)) },
+  // lasting flattening painted by vehicles: rg = fall direction (0..1 → -1..1), b = amount
+  uTrample: { value: null },
+  uTrampleExtent: { value: 200 },
 };
+{
+  const d = new Uint8Array([128, 128, 0, 255]);
+  const t = new THREE.DataTexture(d, 1, 1); t.needsUpdate = true; world.uTrample.value = t;
+}
 
 export const NOISE_GLSL = /* glsl */ `
 float fx_hash13(vec3 p){ p = fract(p*0.1031); p += dot(p, p.zyx+31.32); return fract((p.x+p.y)*p.z); }
@@ -33,6 +43,7 @@ float fx_fbm(vec3 p){ float a=0.5, s=0.0; for(int i=0;i<4;i++){ s+=a*fx_vnoise(p
 
 const WIND_UNIFORMS = /* glsl */ `
 uniform float uTime; uniform vec2 uWindDir; uniform float uWindStrength; uniform float uWindHeight;
+uniform vec4 uPush[4]; uniform vec4 uPushDir[4]; uniform sampler2D uTrample; uniform float uTrampleExtent;
 `;
 
 // Runs inside the vertex shader after <begin_vertex>; bends `transformed` in local space.
@@ -56,6 +67,32 @@ export const WIND_GLSL = /* glsl */ `
                       cos(uTime * 4.3 + ph + position.x * 7.0 + position.z * 5.0)) * 0.035 * wh;
   vec3 offW = (wdir * sway * 0.32 * wh + flutter * (0.6 + gust)) * uWindStrength;
   offW.y -= length(offW.xz) * 0.35 * wh;
+
+  // pushed aside by the truck / the player, or flattened where a vehicle has driven
+  vec2 bendDir = vec2(0.0); float bend = 0.0;
+  for (int i = 0; i < 4; i++) {
+    vec4 P = uPush[i];
+    if (P.w <= 0.0) continue;
+    vec2 dv = iOrigin.xz - P.xz; float dist = length(dv);
+    float k = 1.0 - smoothstep(P.w * 0.4, P.w, dist);
+    if (k <= 0.0) continue;
+    vec2 away = dist > 1e-3 ? dv / dist : uWindDir;
+    vec2 dir = normalize(away + uPushDir[i].xy * 1.4);
+    // a little shiver on the way down
+    k *= uPushDir[i].z * (0.92 + 0.08 * sin(uTime * 23.0 + ph));
+    bendDir += dir * k; bend = max(bend, k);
+  }
+  vec2 tuv = (iOrigin.xz + uTrampleExtent) / (2.0 * uTrampleExtent);
+  vec4 tr = texture2D(uTrample, tuv);
+  if (tr.b > bend * 0.9) { bendDir = tr.rg * 2.0 - 1.0; bend = max(bend, tr.b); }
+  if (bend > 0.002) {
+    vec2 bd = normalize(bendDir + 1e-5);
+    float hy = position.y * length(iRot[1]);
+    float ang = bend * 1.35 * sqrt(clamp(position.y / uWindHeight, 0.0, 1.0));
+    vec3 o = vec3(bd.x * hy * sin(ang), -hy * (1.0 - cos(ang)), bd.y * hy * sin(ang));
+    offW = offW * (1.0 - bend * 0.8) + o;
+  }
+
   float s2 = max(dot(iRot[0], iRot[0]), 1e-4);
   transformed += (transpose(iRot) * offW) / s2;
 }

@@ -132,5 +132,29 @@ export function createAudio() {
     const g = ctx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(sfx); o.start(t); o.stop(t + dur + 0.02);
   }
 
-  return { startWind, setWind, footstep, createEngine, playMusic, stopMusic, playFile, tone, get ctx() { return ctx; } };
+  // ---------- dry leaves rustling (driving / walking through corn) ----------
+  function createRustle() {
+    let n = null;
+    whenReady(() => {
+      const src = loopNoise(false);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 0.7;
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
+      const g = ctx.createGain(); g.gain.value = 0;
+      // crackle: fast random amplitude flutter
+      const am = ctx.createGain(); am.gain.value = 0.5;
+      const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 17; const lg = ctx.createGain(); lg.gain.value = 0.35; lfo.connect(lg).connect(am.gain); lfo.start();
+      src.connect(hp).connect(bp).connect(am).connect(g).connect(sfx);
+      n = { g, bp, lfo };
+    });
+    return {
+      set(level) {
+        if (!n) return; const t = ctx.currentTime;
+        n.g.gain.setTargetAtTime(Math.min(0.5, level * 0.32), t, level > 0.02 ? 0.05 : 0.25);
+        n.bp.frequency.setTargetAtTime(1800 + level * 1600, t, 0.1);
+        n.lfo.frequency.setTargetAtTime(11 + Math.random() * 14, t, 0.05);
+      },
+    };
+  }
+
+  return { startWind, setWind, footstep, createEngine, createRustle, playMusic, stopMusic, playFile, tone, get ctx() { return ctx; } };
 }

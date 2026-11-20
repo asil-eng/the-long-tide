@@ -95,6 +95,8 @@ export class Truck {
       this.vc.setWheelBrake(i, brakeF);
     }
     this.vc.updateVehicle(h);
+    // standing corn drags on the bumper
+    if (this.cornDrag) { const v = this.body.linvel(), m = this.body.mass(); this.body.applyImpulse({ x: -v.x * m * this.cornDrag * h, y: 0, z: -v.z * m * this.cornDrag * h }, true); }
     // arcade assist: keep it planted and kill some sideways slide
     const lv = this.body.linvel(), f = this.forward, right = V(0, 0, 1).applyQuaternion(this.quaternion);
     const side = lv.x * right.x + lv.y * right.y + lv.z * right.z;

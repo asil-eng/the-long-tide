@@ -1,5 +1,6 @@
-// Third-person player: Rapier kinematic character controller + procedural walk/run animation
-// on a Mixamo-style rig (the downloaded character only ships a T-pose, so the cycle is built in code).
+// Third-person player: Rapier kinematic character controller + motion-captured idle/walk/run
+// clips retargeted onto the character's Mixamo rig, blended by speed with phase-synced feet.
+// (A procedural cycle remains as a fallback if the clips fail to load.)
 import * as THREE from 'three';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -80,8 +81,9 @@ export class Player {
     // movement relative to the camera
     const f = input.axis('KeyS', 'KeyW'), s = input.axis('KeyA', 'KeyD');
     const run = input.key('ShiftLeft') || input.key('ShiftRight');
-    const target = (f || s) ? (run ? 4.6 : 1.7) : 0;
-    this.speed = THREE.MathUtils.damp(this.speed, target, target > this.speed ? 6 : 9, dt);
+    const target = (f || s) ? (run ? 4.8 : 1.6) : 0;
+    // ease into a run, settle quickly when stopping
+    this.speed = THREE.MathUtils.damp(this.speed, target, target > this.speed ? (run ? 3.2 : 5) : 7, dt);
     const fwd = V(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
     const right = V(-fwd.z, 0, fwd.x);
     const dir = fwd.multiplyScalar(f).add(right.multiplyScalar(s));
@@ -89,9 +91,13 @@ export class Player {
       dir.normalize();
       const want = Math.atan2(dir.x, dir.z);
       let d = want - this.facing; d = Math.atan2(Math.sin(d), Math.cos(d));
-      this.facing += d * Math.min(1, dt * 10);
-      this.moveDir = dir;
-    }
+      const turnRate = THREE.MathUtils.lerp(11, 6.5, THREE.MathUtils.clamp(this.speed / 4.8, 0, 1));
+      const step = d * Math.min(1, dt * turnRate);
+      this.facing += step;
+      this.turnVel = step / Math.max(dt, 1e-4);
+      // move direction follows the body with a little inertia (no instant 180° snaps)
+      this.moveDir = this.moveDir ? this.moveDir.lerp(dir, Math.min(1, dt * (run ? 7 : 10))).normalize() : dir.clone();
+    } else this.turnVel = 0;
     const md = this.moveDir || V(0, 0, 1);
     this.vy = this.grounded ? -1 : this.vy - 9.81 * dt;
     const desired = { x: md.x * this.speed * dt, y: this.vy * dt, z: md.z * this.speed * dt };
@@ -102,8 +108,79 @@ export class Player {
     this.body.setNextKinematicTranslation({ x: t.x + mv.x, y: t.y + mv.y, z: t.z + mv.z });
     this.actualSpeed = Math.hypot(mv.x, mv.z) / Math.max(dt, 1e-4);
     this.sync();
-    this.animate(dt);
+    if (this.mixer) this.animateClips(dt); else this.animate(dt);
+    // lean into turns, a touch forward when accelerating
+    const lean = THREE.MathUtils.clamp(-(this.turnVel || 0) * this.speed * 0.022, -0.16, 0.16);
+    this.leanZ = THREE.MathUtils.damp(this.leanZ || 0, lean, 6, dt);
+    this.inner.rotation.z = this.leanZ;
     this.updateCamera(dt, camera);
+  }
+
+  // ---------------- motion-captured locomotion ----------------
+  /** Retarget Mixamo clips from another rig onto this character (by bone name, rest-pose corrected). */
+  setClips(srcScene, srcClips, names = { idle: /idle/i, walk: /walk/i, run: /run/i, sit: /sitidle/i }) {
+    const norm = (n) => n.replace(/^mixamorig:?/, '').replace(/_\d+$/, '');
+    const srcRest = new Map(); let srcHipsY = 1, srcHipsBone = null;
+    srcScene.traverse((o) => { if (o.isBone) { srcRest.set(norm(o.name), o.quaternion.clone()); if (norm(o.name) === 'Hips') { srcHipsY = o.position.y; srcHipsBone = o; } } });
+    const tgt = new Map(); this.model.traverse((o) => { if (o.isBone) tgt.set(norm(o.name), o); });
+    const tHips = tgt.get('Hips'); const tRestPos = tHips.position.clone();
+    const ratio = tRestPos.y / (srcHipsY || 1);
+    const qs = new THREE.Quaternion(), qr = new THREE.Quaternion();
+    this.mixer = new THREE.AnimationMixer(this.model);
+    this.clips = {}; this.actions = {};
+    for (const [key, re] of Object.entries(names)) {
+      const clip = srcClips.find((c) => re.test(c.name)); if (!clip) continue;
+      const tracks = []; let travel = 0;
+      for (const tr of clip.tracks) {
+        const dot = tr.name.lastIndexOf('.'); const node = norm(tr.name.slice(0, dot)), prop = tr.name.slice(dot + 1);
+        const bone = tgt.get(node); if (!bone) continue;
+        if (prop === 'quaternion') {
+          const rs = srcRest.get(node) || new THREE.Quaternion(), rt = this.rest.get(bone);
+          const rsInv = rs.clone().invert(); const v = tr.values.slice();
+          for (let i = 0; i < v.length; i += 4) {
+            qs.fromArray(v, i); qr.copy(qs).multiply(rsInv).multiply(rt); qr.toArray(v, i);
+          }
+          tracks.push(new THREE.QuaternionKeyframeTrack(`${bone.name}.quaternion`, tr.times, v));
+        } else if (prop === 'position' && node === 'Hips') {
+          const v = tr.values.slice(), n = v.length / 3;
+          travel = Math.hypot(v[(n - 1) * 3] - v[0], v[(n - 1) * 3 + 2] - v[2]) / (srcHipsY || 1);
+          for (let i = 0; i < n; i++) { v[i * 3] = tRestPos.x; v[i * 3 + 1] = tRestPos.y + (v[i * 3 + 1] - srcHipsY) * ratio; v[i * 3 + 2] = tRestPos.z; }
+          tracks.push(new THREE.VectorKeyframeTrack(`${bone.name}.position`, tr.times, v));
+        }
+      }
+      const c = new THREE.AnimationClip(key, clip.duration, tracks);
+      // natural ground speed of the clip: hip-heights travelled per second × ~0.95 m hip height
+      c.userData = { speed: travel > 0.2 ? travel * 0.95 / clip.duration : { walk: 1.35, run: 3.7 }[key] || 0 };
+      this.clips[key] = c;
+      const a = this.mixer.clipAction(c); a.play(); a.setEffectiveWeight(key === 'idle' ? 1 : 0); this.actions[key] = a;
+    }
+    this.cycle = 0; this.blend = { idle: 1, walk: 0, run: 0 };
+    console.log('[player] clips', Object.entries(this.clips).map(([k, c]) => `${k} ${c.duration.toFixed(2)}s ${c.userData.speed.toFixed(2)}m/s`).join(', '));
+  }
+
+  animateClips(dt) {
+    const sp = this.smoothSpeed = THREE.MathUtils.damp(this.smoothSpeed || 0, Math.min(this.actualSpeed ?? 0, 6), 10, dt);
+    const W = this.clips.walk, R = this.clips.run;
+    const wN = W?.userData.speed || 1.35, rN = R?.userData.speed || 3.7;
+    // weights: idle → walk → run
+    const moveK = THREE.MathUtils.smoothstep(sp, 0.08, 0.9);
+    const runK = R ? THREE.MathUtils.smoothstep(sp, 2.0, 4.2) : 0;
+    const target = { idle: 1 - moveK, walk: moveK * (1 - runK), run: moveK * runK };
+    for (const k of Object.keys(target)) {
+      if (!this.actions[k]) continue;
+      this.blend[k] = THREE.MathUtils.damp(this.blend[k], target[k], 8, dt);
+      this.actions[k].setEffectiveWeight(this.blend[k]);
+    }
+    // one shared gait phase so the feet of walk and run stay in step while blending
+    const rate = (this.blend.walk * (Math.max(sp, 0.6) / wN) / (W?.duration || 1) + this.blend.run * (Math.max(sp, 1.5) / rN) / (R?.duration || 1))
+      / Math.max(this.blend.walk + this.blend.run, 1e-3);
+    const prev = this.cycle;
+    this.cycle = (this.cycle + rate * dt) % 1;
+    if (this.actions.walk) { this.actions.walk.time = this.cycle * W.duration; this.actions.walk.setEffectiveTimeScale(0); }
+    if (this.actions.run) { this.actions.run.time = this.cycle * R.duration; this.actions.run.setEffectiveTimeScale(0); }
+    // footsteps at the two contacts of the cycle
+    if (moveK > 0.5) for (const c of [0.0, 0.5]) if ((prev < c && this.cycle >= c) || (prev > this.cycle && c === 0)) this.onStep?.(0.35 + runK * 0.65);
+    this.mixer.update(dt);
   }
 
   sync() {
@@ -172,14 +249,15 @@ export class Player {
     const back = V(Math.sin(this.yaw) * Math.cos(this.pitch), Math.sin(this.pitch), Math.cos(this.yaw) * Math.cos(this.pitch));
     const side = V(Math.cos(this.yaw), 0, -Math.sin(this.yaw)).multiplyScalar(0.45); // over-the-shoulder
     if (this.bounds) side.multiplyScalar(0.55);
-    let dist = this.bounds ? 2.3 : this.camDist;
+    this.runCam = THREE.MathUtils.damp(this.runCam || 0, THREE.MathUtils.smoothstep(this.speed, 2.5, 4.8), 3, dt);
+    let dist = this.bounds ? 2.3 : this.camDist + this.runCam * 0.7;
     const from = target.clone().add(side);
     const hit = this.physics.ray(from, back, dist + 0.3, this.collider);
     if (hit !== null) dist = Math.max(0.6, hit - 0.3);
     const want = from.clone().addScaledVector(back, dist);
     if (this.bounds) { const B = this.bounds; want.x = THREE.MathUtils.clamp(want.x, B.x0, B.x1); want.z = THREE.MathUtils.clamp(want.z, B.z0, B.z1); want.y = THREE.MathUtils.clamp(want.y, B.y0, B.y1); }
     if (!this.camInit) { this.camPos.copy(want); this.camInit = true; }
-    this.camPos.lerp(want, 1 - Math.exp(-dt * 14));
+    this.camPos.lerp(want, 1 - Math.exp(-dt * 11));
     camera.position.copy(this.camPos);
     camera.lookAt(target.clone().add(side));
   }

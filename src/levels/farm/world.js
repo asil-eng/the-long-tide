@@ -181,7 +181,7 @@ export async function buildFarmWorld(scene, { high = true } = {}) {
 
   console.log(`[farm] corn ${corn.total} instances in ${corn.tiles.length} tiles, grass ${grass.total}, colliders ${colliders.length}`);
   return {
-    layout, colliders, models: M, house,
+    layout, colliders, models: M, house, corn, grass,
     update(camPos) { corn.update(camPos); grass.update(camPos); },
   };
 }

@@ -18,7 +18,8 @@ All third-party assets are CC0 or CC-BY. CC-BY authors must also appear on the i
 | bookshelf.glb | Wooden Bookcases with Books | Matthew Collings (mtcollings) | https://sketchfab.com/3d-models/wooden-bookcases-with-books-d0618ac16b2a4a87b9b6c7d5e6765626 | Modified: rescaled |
 | bedroom_bed.glb | Single wooden bed | franckross | https://sketchfab.com/3d-models/single-wooden-bed-c7bea79b8c7a4b7c9ec5eadfa2529b9a | Modified: rescaled |
 | bedroom_desk.glb | Vintage Wooden Workdesk | Poring | https://sketchfab.com/3d-models/vintage-wooden-workdesk-f1eddff773a740b78110610cef248093 | Modified: rescaled |
-| player.glb | Hendrik the engineer who became a sheep herder | ustoopia | https://sketchfab.com/3d-models/hendrik-the-engineer-who-became-a-sheep-herder-84d6704563734976982f0d3491d726c6 | Modified: kept the T-pose rig only, rescaled to 1.8 m; walk/run animation is procedural (code) |
+| anims.glb | Basic Human Male (idle/walk/run/sit clips, retargeted onto player.glb) | enzinogenie | https://sketchfab.com/3d-models/basic-human-male-f1775be7b1b94e4ea40d25287585ee69 | Modified: clips retargeted by bone name, made in-place |
+| player.glb | Hendrik the engineer who became a sheep herder | ustoopia | https://sketchfab.com/3d-models/hendrik-the-engineer-who-became-a-sheep-herder-84d6704563734976982f0d3491d726c6 | Modified: kept the T-pose rig only, rescaled to 1.8 m; animation from anims.glb |
 
 ## Poly Haven (CC0)
 | File | Asset | Authors | Source |
