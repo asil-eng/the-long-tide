@@ -10,6 +10,11 @@ import { Player } from '../../core/player.js';
 import { Truck } from '../../core/truck.js';
 import { createAudio } from '../../systems/audio.js';
 import { createDustTrail } from '../../assets/dustTrail.js';
+import { createDialogue } from '../../systems/dialogue.js';
+import { createCutscenes } from '../../systems/cutscene.js';
+import { createTriggers } from '../../systems/triggers.js';
+import { createTimeCounter } from '../../systems/timecounter.js';
+import { STORY } from '../../story.js';
 
 export async function startFarm(game) {
   const { scene, camera, renderer, high } = game;
@@ -46,6 +51,13 @@ export async function startFarm(game) {
   const hint = document.createElement('div'); hint.className = 'hud-hint'; game.ui.appendChild(hint);
   const showHint = (html) => { if (html) { hint.innerHTML = html; hint.classList.add('on'); } else hint.classList.remove('on'); };
   let mode = 'foot';
+  const dialogue = game.dialogue = createDialogue(game.ui, input, audio);
+  const cutscenes = game.cutscenes = createCutscenes(game.ui, camera, input, audio);
+  const triggers = game.triggers = createTriggers(input, showHint);
+  const timeCounter = game.timeCounter = createTimeCounter(game.ui, { startAge: 10 });
+  timeCounter.show(false); // hidden on the Farm
+  const busy = () => dialogue.busy || cutscenes.running;
+  const lockedInput = { axis: () => 0, key: () => false, hit: () => false, takeMouse: () => input.takeMouse() };
   function enterTruck() { mode = 'truck'; player.setActive(false); truck.enter(); }
   function exitTruck() {
     const d = truck.doorPoint; d.y = heightAt(d.x, d.z);
@@ -68,20 +80,40 @@ export async function startFarm(game) {
     camera.position.set(...v.pos); controls.target.set(...v.target); controls.update();
   }
 
+  if (params.get('test') === 'systems') {
+    setTimeout(async () => {
+      const p = player.position;
+      await cutscenes.play({ fadeIn: 1, subs: STORY.systemTest.subs, shots: [
+        { path: [[p.x + 14, 6, p.z + 16], [p.x + 6, 3, p.z + 10], [p.x - 2, 2.2, p.z + 6]], look: [-13.5, 4, -4], dur: 5 },
+        { path: [[-2, 1.8, 12], [-6, 1.7, 6]], look: [[-13.5, 4, -4], [-13.5, 3, -2]], dur: 3.5 },
+      ] });
+      await dialogue.play(STORY.systemTest.dialogue);
+    }, 600);
+  }
+
   let ready = 0;
   const level = {
     grade: FARM_GRADE,
-    input, player, physics, farm, atmo, truck, audio, dust,
+    input, player, physics, farm, atmo, truck, audio, dust, dialogue, cutscenes, triggers, timeCounter,
+    get typing() { return dialogue.busy; },
     get mode() { return mode; }, enterTruck, exitTruck,
     update(dt) {
-      physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot') player.update(h, input, camera); });
-      truck.update(dt, input, mode === 'truck' ? camera : null);
+      dialogue.update(dt);
+      const cine = cutscenes.running;
+      truck.locked = busy();
+      physics.step(dt, (h) => { truck.step(h, input); if (mode === 'foot' && !cine) player.update(h, busy() ? lockedInput : input, camera); });
+      truck.update(dt, input, mode === 'truck' && !cine ? camera : null);
+      cutscenes.update(dt);
+      timeCounter.update(dt);
       dust.update(dt);
       // E: get in / out of the truck
       const near = mode === 'foot' && player.position.distanceTo(truck.doorPoint.setY(player.position.y)) < 2.6 && Math.abs(truck.speed) < 2;
-      if (mode === 'foot') showHint(near ? '<kbd>E</kbd>Drive' : null);
+      const zoneHint = mode === 'foot' && !busy() ? triggers.update(player.position) : null;
+      if (busy()) showHint(null);
+      else if (mode === 'foot') showHint(zoneHint || (near ? '<kbd>E</kbd>Drive' : null));
       else showHint(Math.abs(truck.speed) < 1.5 ? '<kbd>E</kbd>Get out &nbsp; <kbd>R</kbd>Reset' : null);
-      if (input.hit('KeyE')) { if (near) enterTruck(); else if (mode === 'truck' && Math.abs(truck.speed) < 2.5) exitTruck(); }
+      if (input.hit('KeyE') && !busy() && !input.state.consumedE) { if (near && !zoneHint) enterTruck(); else if (mode === 'truck' && Math.abs(truck.speed) < 2.5) exitTruck(); }
+      input.state.consumedE = false;
       if (mode === 'truck' && input.hit('KeyR')) truck.reset();
       if (controls) controls.update();
       farm.update(camera.position);
